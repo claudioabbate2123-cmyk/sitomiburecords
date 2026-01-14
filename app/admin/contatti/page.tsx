@@ -68,6 +68,7 @@ export default function AdminContatti() {
               <tr>
                 <th>Data</th>
                 <th>Nome</th>
+                <th>Cognome</th>
                 <th>Email</th>
                 <th>Messaggio</th>
               </tr>
@@ -79,8 +80,9 @@ export default function AdminContatti() {
                     {new Date(c.created_at).toLocaleDateString("it-IT")}
                   </td>
                   <td>
-                    {c.nome} {c.cognome}
+                    {c.nome} 
                   </td>
+                  <td>{c.cognome}</td>
                   <td>{c.email}</td>
                   <td>{c.messaggio}</td>
                 </tr>
