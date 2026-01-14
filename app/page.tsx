@@ -106,11 +106,11 @@ export default function Home() {
                   Corsi
                 </Link>
                 <Link 
-                  href="/didattica/dispense" 
+                  href="/didattica/materialedidattico" 
                   style={styles.dropdownItem}
                   onClick={() => setDidatticaOpen(false)}
                 >
-                  Dispense
+                  Materiale didattico
                 </Link>
               </div>
             )}

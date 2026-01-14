@@ -61,6 +61,7 @@ const styles: Record<string, React.CSSProperties> = {
   title: {
     fontSize: 32,
     marginBottom: 32,
+    color: "#000",
   },
 
   grid: {
