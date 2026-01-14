@@ -119,15 +119,16 @@ export default function Home() {
         </div>
 
         {/* BIO EDITORIALE */}
+      <div style={styles.mainColumn}>
         <section style={styles.editorial}>
           <p style={styles.editorialText}>
-            <strong>MIBU</strong> nasce da un’idea di Claudio Abbate e Fabrizio
-            Pironi: creare uno spazio in cui musica, persone e progetti possano
+            <strong>MIBU</strong> nasce da un’idea di <strong>Claudio Abbate</strong>  e <strong>Fabrizio Pironi</strong>: 
+            creare uno spazio in cui musica, persone e progetti possano
             incontrarsi.
           </p>
 
           <p style={styles.editorialText}>
-            <strong>MIBU</strong> non è solo un luogo fisico, ma un modo per
+            Non si tratta solo un luogo fisico, ma di un modo per
             connettersi tramite la musica e tutti i suoi benefici.
           </p>
 
@@ -201,6 +202,7 @@ export default function Home() {
         </main>
       </div>
     </div>
+  </div>
   );
 }
 
@@ -219,7 +221,11 @@ const styles: Record<string, React.CSSProperties> = {
     gap: 40,
     marginTop: 27,
   },
-
+  mainColumn: {
+    maxWidth: 1300,
+    margin: "0 auto",
+    padding: "0 8px",
+  },
   image: {
     width: 220,
     height: 300,
@@ -315,9 +321,7 @@ const styles: Record<string, React.CSSProperties> = {
   },
 
   editorial: {
-    maxWidth: 1300,
-    margin: "32px auto 0",
-    padding: "0 8px",
+    marginTop:32,
   },
 
   editorialText: {
@@ -328,12 +332,12 @@ const styles: Record<string, React.CSSProperties> = {
   },
 
   formCard: {
-    background: "#fff",
-    maxWidth: 520,
-    margin: "32px 370px 40px",
-    padding: 24,
-    borderRadius: 8,
-    boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+  background: "#fff",
+  maxWidth: 520,
+  margin: "32px 0px 40px", // 👈 auto, non px
+  padding: 24,
+  borderRadius: 8,
+  boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
   },
 
   submit: {
