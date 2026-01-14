@@ -24,7 +24,8 @@ export default function AdminContatti() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function checkAuthAndLoad() {
+    async function loadData() {
+      // 🔐 Controllo sessione
       const { data } = await supabase.auth.getSession();
 
       if (!data.session) {
@@ -32,19 +33,22 @@ export default function AdminContatti() {
         return;
       }
 
+      // 📩 Lettura tabella Contatto
       const { data: contatti, error } = await supabase
-        .from("contatti")
+        .from("Contatto")
         .select("*")
         .order("created_at", { ascending: false });
 
-      if (!error && contatti) {
+      if (error) {
+        console.error("Errore caricamento contatti:", error);
+      } else if (contatti) {
         setContatti(contatti);
       }
 
       setLoading(false);
     }
 
-    checkAuthAndLoad();
+    loadData();
   }, [router]);
 
   if (loading) {
