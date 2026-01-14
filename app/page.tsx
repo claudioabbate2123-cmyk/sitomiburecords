@@ -89,10 +89,10 @@ export default function Home() {
                 <Link href="/didattica/laboratori" style={styles.dropdownItem}>
                   Laboratori
                 </Link>
-                <Link href="/corsi" style={styles.dropdownItem}>
+                <Link href="didattica/corsi" style={styles.dropdownItem}>
                   Corsi
                 </Link>
-                <Link href="/dispense" style={styles.dropdownItem}>
+                <Link href="/didattica/dispense" style={styles.dropdownItem}>
                   Dispense
                 </Link>
               </div>
@@ -330,7 +330,7 @@ const styles: Record<string, React.CSSProperties> = {
   formCard: {
     background: "#fff",
     maxWidth: 520,
-    margin: "32px 200px 40px",
+    margin: "32px 370px 40px",
     padding: 24,
     borderRadius: 8,
     boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
