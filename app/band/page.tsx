@@ -102,6 +102,7 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: 42,
     fontWeight: 800,
     marginBottom: 16,
+    color: "#000",
   },
 
   intro: {
@@ -128,6 +129,7 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: 32,
     fontWeight: 700,
     marginBottom: 8,
+    color: "#000",
   },
 
   genre: {
@@ -157,6 +159,7 @@ const styles: Record<string, React.CSSProperties> = {
     fontWeight: 700,
     marginBottom: 32,
     textAlign: "center",
+    color: "#000",
   },
 
   grid: {
@@ -176,6 +179,7 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: 18,
     fontWeight: 700,
     marginBottom: 6,
+    color: "#000",
   },
 
   cardGenre: {
