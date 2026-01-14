@@ -329,12 +329,13 @@ const styles: Record<string, React.CSSProperties> = {
   },
 
   siteName: {
-    fontSize: 48,
-    fontWeight: 800,
-    letterSpacing: 4,
-    margin: "0 auto",
-    textAlign: "center",
-  },
+  fontSize: 48,
+  fontWeight: 800,
+  letterSpacing: 4,
+  margin: "0 auto",
+  textAlign: "center",
+  color: "#000", // colore nero 
+},
 
   login: {
     textDecoration: "none",
