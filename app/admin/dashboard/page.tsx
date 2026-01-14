@@ -33,6 +33,10 @@ export default function AdminDashboard() {
           <h2>📦 Inventario</h2>
           <p>Consulta e modifica attrezzatura</p>
         </Link>
+        <Link href="/admin/contatti" style={styles.card}>
+          <h2>📩 Contatti</h2>
+          <p>Messaggi dal form di contatto</p>
+        </Link>
       </div>
 
       <button
