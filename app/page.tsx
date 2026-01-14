@@ -82,17 +82,34 @@ export default function Home() {
             onMouseEnter={() => setDidatticaOpen(true)}
             onMouseLeave={() => setDidatticaOpen(false)}
           >
-            <span style={styles.navLinkDropdown}>Didattica ▾</span>
+            <span 
+              style={styles.navLinkDropdown}
+              onClick={() => setDidatticaOpen((prev) => !prev)}
+              >
+                Didattica ▾
+            </span>
 
             {didatticaOpen && (
               <div style={styles.dropdownMenu}>
-                <Link href="/didattica/laboratori" style={styles.dropdownItem}>
+                <Link 
+                  href="/didattica/laboratori" 
+                  style={styles.dropdownItem}
+                  onClick={() => setDidatticaOpen(false)}
+                >
                   Laboratori
                 </Link>
-                <Link href="didattica/corsi" style={styles.dropdownItem}>
+                <Link 
+                  href="/didattica/corsi" 
+                  style={styles.dropdownItem}
+                  onClick={() => setDidatticaOpen(false)}
+                >
                   Corsi
                 </Link>
-                <Link href="/didattica/dispense" style={styles.dropdownItem}>
+                <Link 
+                  href="/didattica/dispense" 
+                  style={styles.dropdownItem}
+                  onClick={() => setDidatticaOpen(false)}
+                >
                   Dispense
                 </Link>
               </div>
@@ -112,14 +129,15 @@ export default function Home() {
           </Link>
         </header>
 
-        {/* IMMAGINI */}
+       
+
+        {/* BIO EDITORIALE */}
+      <div style={styles.mainColumn}>
+         {/* IMMAGINI */}
         <div style={styles.imagesRow}>
           <img src="/claudio.jpeg" alt="Claudio" style={styles.image} />
           <img src="/fabrizio.jpeg" alt="Fabrizio" style={styles.image} />
         </div>
-
-        {/* BIO EDITORIALE */}
-      <div style={styles.mainColumn}>
         <section style={styles.editorial}>
           <p style={styles.editorialText}>
             <strong>MIBU</strong> nasce da un’idea di <strong>Claudio Abbate</strong>  e <strong>Fabrizio Pironi</strong>: 
@@ -215,23 +233,27 @@ const styles: Record<string, React.CSSProperties> = {
     fontFamily: "sans-serif",
   },
 
-  imagesRow: {
-    display: "flex",
-    justifyContent: "center",
-    gap: 40,
-    marginTop: 27,
-  },
+ imagesRow: {
+  display: "flex",
+  justifyContent: "center",
+  gap: 40,
+  marginTop: 27,
+  flexWrap: "wrap",     // 👈 importantissimo
+},
+
   mainColumn: {
     maxWidth: 1300,
     margin: "0 auto",
     padding: "0 8px",
   },
   image: {
-    width: 220,
-    height: 300,
-    objectFit: "cover",
-    borderRadius: 8,
-  },
+  width: "100%",
+  maxWidth: 220,   // 👈 limite, non obbligo
+  height: "auto",
+  aspectRatio: "11 / 15",
+  objectFit: "cover",
+  borderRadius: 8,
+},
 
   sidebar: {
     width: 220,
@@ -289,11 +311,14 @@ const styles: Record<string, React.CSSProperties> = {
   },
 
   content: {
-    flex: 1,
-    background: "#f4f4f4",
-    display: "flex",
-    flexDirection: "column",
-  },
+  flex: 1,
+  background: "#f4f4f4",
+  display: "flex",
+  flexDirection: "column",
+  minWidth: 0,          // 👈 FONDAMENTALE
+  overflowX: "hidden",  // 👈 sicurezza extra
+},
+
 
   header: {
     background: "#e0e0e0",
