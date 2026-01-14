@@ -108,5 +108,6 @@ const styles: Record<string, React.CSSProperties> = {
     width: "100%",
     borderCollapse: "collapse",
     background: "#fff",
+    color: "#000",
   },
 };
