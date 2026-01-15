@@ -1,8 +1,9 @@
 "use client";
 
-/* 🔴 FONDAMENTALE: TRIPLETTA COMPLETA */
+/* ================= FIX DEPLOY VERCEL ================= */
+/* ❌ NO revalidate su Client Component */
+/* ✅ dynamic + fetchCache sono sufficienti */
 export const dynamic = "force-dynamic";
-export const revalidate = 0;
 export const fetchCache = "force-no-store";
 
 import { useEffect, useState } from "react";
@@ -45,7 +46,7 @@ export default function SalaProveEditPage() {
     nome_gruppo: "",
   });
 
-  /* ================= LOAD EVENTI ================= */
+  /* ================= LOAD EVENTI DEL GIORNO ================= */
 
   const fetchEventi = async () => {
     if (!dataSelezionata) return;
@@ -83,11 +84,14 @@ export default function SalaProveEditPage() {
   /* ================= DELETE EVENTO ================= */
 
   const eliminaEvento = async (id: number) => {
-    if (!confirm("Eliminare questa prenotazione?")) return;
+    const conferma = confirm("Eliminare questa prenotazione?");
+    if (!conferma) return;
 
     setLoading(true);
+
     await supabase.from("salaprove").delete().eq("id", id);
     await fetchEventi();
+
     setLoading(false);
   };
 
@@ -204,6 +208,7 @@ export default function SalaProveEditPage() {
         💾 Salva prenotazione
       </button>
 
+      {/* ================= TABELLA EVENTI ================= */}
       <table style={styles.table}>
         <thead>
           <tr>
@@ -218,6 +223,7 @@ export default function SalaProveEditPage() {
           {eventi.map((e) => (
             <tr key={e.id}>
               <td style={styles.td}>{e.nome_gruppo}</td>
+
               <td style={styles.td}>
                 <input
                   type="time"
@@ -228,6 +234,7 @@ export default function SalaProveEditPage() {
                   }
                 />
               </td>
+
               <td style={styles.td}>
                 <input
                   type="time"
@@ -238,6 +245,7 @@ export default function SalaProveEditPage() {
                   }
                 />
               </td>
+
               <td style={styles.td}>
                 <input
                   type="text"
@@ -248,10 +256,12 @@ export default function SalaProveEditPage() {
                   }
                 />
               </td>
+
               <td style={{ ...styles.td, textAlign: "center" }}>
                 <button
                   onClick={() => eliminaEvento(e.id)}
                   style={styles.deleteButton}
+                  title="Elimina"
                 >
                   ✕
                 </button>
@@ -344,4 +354,3 @@ const styles: Record<string, React.CSSProperties> = {
     textAlign: "center",
   },
 };
-
