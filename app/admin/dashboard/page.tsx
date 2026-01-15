@@ -37,6 +37,14 @@ export default function AdminDashboard() {
           <h2>📩 Contatti</h2>
           <p>Messaggi dal form di contatto</p>
         </Link>
+        <Link href="/admin/salaprove" style={styles.card}>
+          <h2>🎛️ Sala Prove</h2>
+          <p>Gestisci prenotazioni e calendario</p>
+        </Link>
+        <Link href="/admin/bilanciomensile" style={styles.card}>
+          <h2>📊 Bilancio mensile</h2>
+          <p>Consulta gli incassi della sala prove</p>
+        </Link>
       </div>
 
       <button
