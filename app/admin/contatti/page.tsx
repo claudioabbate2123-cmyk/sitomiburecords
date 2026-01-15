@@ -57,7 +57,7 @@ export default function AdminContatti() {
 
   return (
     <main style={styles.page}>
-      <h1>Messaggi di contatto</h1>
+      <h1>Messaggi di contattofdfdf</h1>
 
       {contatti.length === 0 ? (
         <p>Nessun messaggio ricevuto</p>
