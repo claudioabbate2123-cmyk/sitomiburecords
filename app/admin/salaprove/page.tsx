@@ -49,32 +49,6 @@ export default function SalaProveCalendar() {
   const [year, setYear] = useState(today.getFullYear());
   const [prenotazioni, setPrenotazioni] = useState<Prenotazione[]>([]);
 
-  /* ================= FETCH PRENOTAZIONI ================= */
-
-  useEffect(() => {
-    const fetchPrenotazioni = async () => {
-      const start = new Date(year, month, 1)
-        .toISOString()
-        .split("T")[0];
-
-      const end = new Date(year, month + 1, 0)
-        .toISOString()
-        .split("T")[0];
-
-      const { data, error } = await supabase
-        .from("salaprove")
-        .select("id, data, nome_gruppo, ora_inizio, ora_fine, prezzo")
-        .gte("data", start)
-        .lte("data", end);
-
-      if (!error && data) {
-        setPrenotazioni(data);
-      }
-    };
-
-    fetchPrenotazioni();
-  }, [month, year]);
-
   /* ================= CALCOLO GIORNI ================= */
 
   const firstDayOfMonth = new Date(year, month, 1);
@@ -99,7 +73,7 @@ export default function SalaProveCalendar() {
     current.setDate(current.getDate() + 1);
   }
 
-  /* ======== FIX TIMEZONE (UNICA AGGIUNTA) ======== */
+  /* ======== FORMAT DATE (GIÀ PRESENTE) ======== */
 
   const formatDate = (date: Date) => {
     const y = date.getFullYear();
@@ -107,6 +81,29 @@ export default function SalaProveCalendar() {
     const d = String(date.getDate()).padStart(2, "0");
     return `${y}-${m}-${d}`;
   };
+
+  /* ================= FETCH PRENOTAZIONI ================= */
+
+  useEffect(() => {
+    const fetchPrenotazioni = async () => {
+      const start = formatDate(startDay);
+      const end = formatDate(endDay);
+
+      const { data, error } = await supabase
+        .from("salaprove")
+        .select("id, data, nome_gruppo, ora_inizio, ora_fine, prezzo")
+        .gte("data", start)
+        .lte("data", end);
+
+      if (!error && data) {
+        setPrenotazioni(data);
+      }
+    };
+
+    fetchPrenotazioni();
+  }, [month, year]);
+
+  /* ================= EVENTI DEL GIORNO ================= */
 
   const eventiDelGiorno = (date: Date) => {
     const d = formatDate(date);
@@ -166,15 +163,22 @@ export default function SalaProveCalendar() {
               key={i}
               style={{
                 ...styles.day,
-                backgroundColor: 
-                  eventi.length > 0 ? "#ffd6d6" : "#d9f7d9",
-                opacity: isCurrentMonth ? 1 : 0.4,
+                backgroundColor: eventi.length > 0
+                  ? isCurrentMonth
+                    ? "#ffd6d6"
+                    : "#ffecec"
+                  : isCurrentMonth
+                    ? "#d9f7d9"
+                    : "#eefaf0",
+                opacity: isCurrentMonth ? 1 : 0.6,
               }}
-            onClick={() => {
-              localStorage.setItem("salaprove:data", formatDate(date));
-              router.push("/admin/salaprove/edit");
-            }}
-  
+              onClick={() => {
+                localStorage.setItem(
+                  "salaprove:data",
+                  formatDate(date)
+                );
+                router.push("/admin/salaprove/edit");
+              }}
             >
               <span style={styles.dayNumber}>
                 {date.getDate()}
@@ -245,7 +249,6 @@ const styles: Record<string, React.CSSProperties> = {
     marginTop: 6,
     fontSize: 13,
     lineHeight: 1.3,
-    color:"#000",
+    color: "#000",
   },
 };
-
