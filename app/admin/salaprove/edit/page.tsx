@@ -140,7 +140,7 @@ export default function SalaProveEditPage() {
   /* ================= GUARD ================= */
 
   if (!dataSelezionata) {
-    return <p>Seleziona una data dal calendario</p>;
+    return <p style={{ color: "#111" }}>Seleziona una data dal calendario</p>;
   }
 
   const formatDateEU = (date: string) => {
@@ -160,52 +160,68 @@ export default function SalaProveEditPage() {
 
       <h2 style={{ marginBottom: 12 }}>Nuova prenotazione</h2>
 
-      <div style={{ display: "flex", gap: 12, marginBottom: 12 }}>
-        <input
-          type="text"
-          placeholder="Nome gruppo"
-          value={nuovaPrenotazione.nome_gruppo}
-          onChange={(e) =>
-            setNuovaPrenotazione({
-              ...nuovaPrenotazione,
-              nome_gruppo: e.target.value,
-            })
-          }
-        />
+      <div style={styles.newBookingRow}>
+        <div style={styles.field}>
+          <label style={styles.label}>Nome gruppo</label>
+          <input
+            style={styles.input}
+            type="text"
+            placeholder="Nome gruppo"
+            value={nuovaPrenotazione.nome_gruppo}
+            onChange={(e) =>
+              setNuovaPrenotazione({
+                ...nuovaPrenotazione,
+                nome_gruppo: e.target.value,
+              })
+            }
+          />
+        </div>
 
-        <input
-          type="time"
-          value={nuovaPrenotazione.ora_inizio}
-          onChange={(e) =>
-            setNuovaPrenotazione({
-              ...nuovaPrenotazione,
-              ora_inizio: e.target.value,
-            })
-          }
-        />
+        <div style={styles.field}>
+          <label style={styles.label}>Ora inizio</label>
+          <input
+            style={styles.input}
+            type="time"
+            value={nuovaPrenotazione.ora_inizio}
+            onChange={(e) =>
+              setNuovaPrenotazione({
+                ...nuovaPrenotazione,
+                ora_inizio: e.target.value,
+              })
+            }
+          />
+        </div>
 
-        <input
-          type="time"
-          value={nuovaPrenotazione.ora_fine}
-          onChange={(e) =>
-            setNuovaPrenotazione({
-              ...nuovaPrenotazione,
-              ora_fine: e.target.value,
-            })
-          }
-        />
+        <div style={styles.field}>
+          <label style={styles.label}>Ora fine</label>
+          <input
+            style={styles.input}
+            type="time"
+            value={nuovaPrenotazione.ora_fine}
+            onChange={(e) =>
+              setNuovaPrenotazione({
+                ...nuovaPrenotazione,
+                ora_fine: e.target.value,
+              })
+            }
+          />
+        </div>
 
-        <input
-          type="number"
-          placeholder="€"
-          value={nuovaPrenotazione.prezzo}
-          onChange={(e) =>
-            setNuovaPrenotazione({
-              ...nuovaPrenotazione,
-              prezzo: e.target.value,
-            })
-          }
-        />
+        <div style={styles.field}>
+          <label style={styles.label}>Prezzo (€)</label>
+          <input
+            style={styles.input}
+            type="number"
+            placeholder="€"
+            value={nuovaPrenotazione.prezzo}
+            onChange={(e) =>
+              setNuovaPrenotazione({
+                ...nuovaPrenotazione,
+                prezzo: e.target.value,
+              })
+            }
+          />
+        </div>
       </div>
 
       <button onClick={salvaNuovaPrenotazione} style={styles.saveButton}>
@@ -226,7 +242,16 @@ export default function SalaProveEditPage() {
         <tbody>
           {eventi.map((e) => (
             <tr key={e.id}>
-              <td style={styles.td}>{e.nome_gruppo}</td>
+              <td style={styles.td}>
+                <input
+                  type="text"
+                  style={styles.input}
+                  defaultValue={e.nome_gruppo}
+                  onBlur={(ev) =>
+                    updateEvento(e.id, "nome_gruppo", ev.target.value)
+                  }
+                />
+              </td>
 
               <td style={styles.td}>
                 <input
@@ -265,7 +290,6 @@ export default function SalaProveEditPage() {
                 <button
                   onClick={() => eliminaEvento(e.id)}
                   style={styles.deleteButton}
-                  title="Elimina"
                 >
                   ✕
                 </button>
@@ -282,7 +306,7 @@ export default function SalaProveEditPage() {
         ← Torna al calendario
       </button>
 
-      {loading && <p>Salvataggio…</p>}
+      {loading && <p style={{ color: "#111" }}>Salvataggio…</p>}
     </main>
   );
 }
@@ -294,6 +318,39 @@ const styles: Record<string, React.CSSProperties> = {
     padding: 32,
     maxWidth: 900,
     margin: "0 auto",
+    backgroundColor: "#ffffff",
+    color: "#111111",
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: 800,
+    marginBottom: 16,
+  },
+  dateBox: {
+    marginBottom: 24,
+    fontSize: 16,
+  },
+  newBookingRow: {
+    display: "flex",
+    gap: 12,
+    flexWrap: "wrap",
+    marginBottom: 16,
+  },
+  field: {
+    display: "flex",
+    flexDirection: "column",
+    minWidth: 140,
+    flex: 1,
+  },
+  label: {
+    fontSize: 13,
+    fontWeight: 600,
+    marginBottom: 4,
+  },
+  table: {
+    width: "100%",
+    borderCollapse: "collapse",
+    marginBottom: 24,
   },
   th: {
     textAlign: "left",
@@ -310,20 +367,10 @@ const styles: Record<string, React.CSSProperties> = {
     width: "100%",
     padding: "6px 8px",
     fontSize: 14,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: 800,
-    marginBottom: 16,
-  },
-  dateBox: {
-    marginBottom: 24,
-    fontSize: 16,
-  },
-  table: {
-    width: "100%",
-    borderCollapse: "collapse",
-    marginBottom: 24,
+    backgroundColor: "#fff",
+    color: "#111",
+    border: "1px solid #ccc",
+    borderRadius: 4,
   },
   saveButton: {
     backgroundColor: "#16a34a",
@@ -354,7 +401,5 @@ const styles: Record<string, React.CSSProperties> = {
     height: 28,
     fontSize: 16,
     cursor: "pointer",
-    lineHeight: "28px",
-    textAlign: "center",
   },
 };
