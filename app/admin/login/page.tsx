@@ -21,18 +21,35 @@ export default function AdminLogin() {
     setLoading(true);
     setError("");
 
-    const { error } = await supabase.auth.signInWithPassword({
+    /* ===== LOGIN ===== */
+    const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
 
-    if (error) {
+    if (error || !data.user) {
       setError("Credenziali non valide");
       setLoading(false);
       return;
     }
 
-    router.push("/admin/dashboard");
+    /* ===== RECUPERO PROFILO ===== */
+    const { data: profile, error: profileError } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", data.user.id)
+      .single();
+
+    if (profileError || !profile) {
+      setError("Errore nel recupero del profilo");
+      setLoading(false);
+      return;
+    }
+
+    /* ===== REDIRECT  ===== */
+    
+      router.push("/admin/dashboard");
+    
   }
 
   return (
@@ -67,6 +84,8 @@ export default function AdminLogin() {
     </main>
   );
 }
+
+/* ================= STILI (INVARIATI) ================= */
 
 const styles: Record<string, React.CSSProperties> = {
   page: {

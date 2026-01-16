@@ -35,56 +35,15 @@ export default function AdminDashboard() {
 
   return (
     <main style={styles.page}>
-      <h1>Dashboard Amministratore</h1>
+      <h1>Dashboard area personale</h1>
 
       <div style={styles.grid}>
-        <Link href="/admin/eventi" style={styles.card}>
-          <h2>📅 Eventi</h2>
-          <p>Crea e gestisci eventi</p>
-        </Link>
-
-        <Link href="/admin/inventario" style={styles.card}>
-          <h2>📦 Inventario</h2>
-          <p>Consulta e modifica attrezzatura</p>
-        </Link>
-
-        <Link href="/admin/contatti" style={styles.card}>
-          <h2>📩 Contatti</h2>
-          <p>Messaggi dal form di contatto</p>
-        </Link>
-
-        <Link href="/admin/salaprove" style={styles.card}>
-          <h2>🎛️ Sala Prove</h2>
-          <p>Gestisci prenotazioni e calendario</p>
-        </Link>
-
-        <Link href="/admin/bilanciomensile" style={styles.card}>
-          <h2>📊 Bilancio mensile</h2>
-          <p>Consulta gli incassi della sala prove</p>
+        <Link href="/admin/calendario_personale" style={styles.card}>
+          <h2>📅 Calendario personale</h2>
         </Link>
       </div>
 
-      {/* ===== AZIONI ADMIN ===== */}
-      <div style={styles.actions}>
-        {role === "super_admin" && (
-          <button
-            onClick={() => router.push("/admin/dashboardareapersonale")}
-            style={styles.superAdminButton}
-          >
-            ⭐ Area personale
-          </button>
-        )}
-
-        <button
-          onClick={async () => {
-            await supabase.auth.signOut();
-            router.push("/");
-          }}
-          style={styles.logout}
-        >
-          Logout
-        </button>
-      </div>
+      
     </main>
   );
 }

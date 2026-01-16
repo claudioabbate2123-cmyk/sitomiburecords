@@ -122,7 +122,7 @@ export default function Home() {
       <div style={styles.content}>
         {/* HEADER */}
         <header style={styles.header}>
-          <h1 style={styles.siteName}>MIBO</h1>
+          <h1 style={styles.siteName}>MIBU</h1>
 
           <Link href="/admin/login" style={styles.login}>
             Login
