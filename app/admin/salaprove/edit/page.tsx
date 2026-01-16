@@ -72,7 +72,6 @@ export default function SalaProveEditPage() {
   const updateEvento = async (
     id: number,
     field: keyof Prenotazione,
-   ,
     value: string
   ) => {
     setLoading(true);
@@ -161,65 +160,52 @@ export default function SalaProveEditPage() {
 
       <h2 style={{ marginBottom: 12 }}>Nuova prenotazione</h2>
 
-      {/* === FORM RESPONSIVE === */}
-      <div style={styles.formGrid}>
-        <div style={styles.field}>
-          <label style={styles.label}>Nome gruppo</label>
-          <input
-            type="text"
-            placeholder="Es. The Rock Band"
-            value={nuovaPrenotazione.nome_gruppo}
-            onChange={(e) =>
-              setNuovaPrenotazione({
-                ...nuovaPrenotazione,
-                nome_gruppo: e.target.value,
-              })
-            }
-          />
-        </div>
+      <div style={{ display: "flex", gap: 12, marginBottom: 12 }}>
+        <input
+          type="text"
+          placeholder="Nome gruppo"
+          value={nuovaPrenotazione.nome_gruppo}
+          onChange={(e) =>
+            setNuovaPrenotazione({
+              ...nuovaPrenotazione,
+              nome_gruppo: e.target.value,
+            })
+          }
+        />
 
-        <div style={styles.field}>
-          <label style={styles.label}>Ora inizio</label>
-          <input
-            type="time"
-            value={nuovaPrenotazione.ora_inizio}
-            onChange={(e) =>
-              setNuovaPrenotazione({
-                ...nuovaPrenotazione,
-                ora_inizio: e.target.value,
-              })
-            }
-          />
-        </div>
+        <input
+          type="time"
+          value={nuovaPrenotazione.ora_inizio}
+          onChange={(e) =>
+            setNuovaPrenotazione({
+              ...nuovaPrenotazione,
+              ora_inizio: e.target.value,
+            })
+          }
+        />
 
-        <div style={styles.field}>
-          <label style={styles.label}>Ora fine</label>
-          <input
-            type="time"
-            value={nuovaPrenotazione.ora_fine}
-            onChange={(e) =>
-              setNuovaPrenotazione({
-                ...nuovaPrenotazione,
-                ora_fine: e.target.value,
-              })
-            }
-          />
-        </div>
+        <input
+          type="time"
+          value={nuovaPrenotazione.ora_fine}
+          onChange={(e) =>
+            setNuovaPrenotazione({
+              ...nuovaPrenotazione,
+              ora_fine: e.target.value,
+            })
+          }
+        />
 
-        <div style={styles.field}>
-          <label style={styles.label}>Prezzo (€)</label>
-          <input
-            type="number"
-            placeholder="€"
-            value={nuovaPrenotazione.prezzo}
-            onChange={(e) =>
-              setNuovaPrenotazione({
-                ...nuovaPrenotazione,
-                prezzo: e.target.value,
-              })
-            }
-          />
-        </div>
+        <input
+          type="number"
+          placeholder="€"
+          value={nuovaPrenotazione.prezzo}
+          onChange={(e) =>
+            setNuovaPrenotazione({
+              ...nuovaPrenotazione,
+              prezzo: e.target.value,
+            })
+          }
+        />
       </div>
 
       <button onClick={salvaNuovaPrenotazione} style={styles.saveButton}>
@@ -241,6 +227,7 @@ export default function SalaProveEditPage() {
           {eventi.map((e) => (
             <tr key={e.id}>
               <td style={styles.td}>{e.nome_gruppo}</td>
+
               <td style={styles.td}>
                 <input
                   type="time"
@@ -251,6 +238,7 @@ export default function SalaProveEditPage() {
                   }
                 />
               </td>
+
               <td style={styles.td}>
                 <input
                   type="time"
@@ -261,6 +249,7 @@ export default function SalaProveEditPage() {
                   }
                 />
               </td>
+
               <td style={styles.td}>
                 <input
                   type="text"
@@ -271,10 +260,12 @@ export default function SalaProveEditPage() {
                   }
                 />
               </td>
+
               <td style={{ ...styles.td, textAlign: "center" }}>
                 <button
                   onClick={() => eliminaEvento(e.id)}
                   style={styles.deleteButton}
+                  title="Elimina"
                 >
                   ✕
                 </button>
@@ -304,40 +295,6 @@ const styles: Record<string, React.CSSProperties> = {
     maxWidth: 900,
     margin: "0 auto",
   },
-  title: {
-    fontSize: 28,
-    fontWeight: 800,
-    marginBottom: 16,
-  },
-  dateBox: {
-    marginBottom: 24,
-    fontSize: 16,
-  },
-
-  /* === FORM === */
-  formGrid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))",
-    gap: 12,
-    marginBottom: 16,
-  },
-  field: {
-    display: "flex",
-    flexDirection: "column",
-  },
-  label: {
-    fontSize: 13,
-    fontWeight: 600,
-    marginBottom: 4,
-    color: "#111",
-  },
-
-  /* === TABLE === */
-  table: {
-    width: "100%",
-    borderCollapse: "collapse",
-    marginBottom: 24,
-  },
   th: {
     textAlign: "left",
     padding: "10px 8px",
@@ -354,7 +311,20 @@ const styles: Record<string, React.CSSProperties> = {
     padding: "6px 8px",
     fontSize: 14,
   },
-
+  title: {
+    fontSize: 28,
+    fontWeight: 800,
+    marginBottom: 16,
+  },
+  dateBox: {
+    marginBottom: 24,
+    fontSize: 16,
+  },
+  table: {
+    width: "100%",
+    borderCollapse: "collapse",
+    marginBottom: 24,
+  },
   saveButton: {
     backgroundColor: "#16a34a",
     color: "#fff",
@@ -384,5 +354,7 @@ const styles: Record<string, React.CSSProperties> = {
     height: 28,
     fontSize: 16,
     cursor: "pointer",
+    lineHeight: "28px",
+    textAlign: "center",
   },
 };
