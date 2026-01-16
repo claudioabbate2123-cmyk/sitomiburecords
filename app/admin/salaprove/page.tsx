@@ -245,6 +245,7 @@ const styles: Record<string, React.CSSProperties> = {
     marginTop: 6,
     fontSize: 13,
     lineHeight: 1.3,
+    color:"#000",
   },
 };
 
