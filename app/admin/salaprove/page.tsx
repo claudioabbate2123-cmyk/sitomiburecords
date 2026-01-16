@@ -166,15 +166,15 @@ export default function SalaProveCalendar() {
               key={i}
               style={{
                 ...styles.day,
-                backgroundColor:
+                backgroundColor: 
                   eventi.length > 0 ? "#ffd6d6" : "#d9f7d9",
                 opacity: isCurrentMonth ? 1 : 0.4,
               }}
-              onClick={() =>
-                router.push(
-                  `/admin/salaprove/edit?data=${formatDate(date)}`
-                )
-              }
+            onClick={() => {
+              localStorage.setItem("salaprove:data", formatDate(date));
+              router.push("/admin/salaprove/edit");
+            }}
+  
             >
               <span style={styles.dayNumber}>
                 {date.getDate()}
