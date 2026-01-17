@@ -181,6 +181,37 @@ export default function CalendarioPersonaleEditPage() {
     setLoading(false);
   };
 
+  /* ================= RIMANDA A DOMANI ================= */
+
+  const rimandaADomani = async () => {
+    if (!dataSelezionata) return;
+
+    const domani = new Date(dataSelezionata);
+    domani.setDate(domani.getDate() + 1);
+
+    const dataDomani = domani.toISOString().slice(0, 10);
+
+    const daRimandare = coseDaFare.filter((c) => !c.fatto);
+
+    if (daRimandare.length === 0) {
+      alert("Nessuna cosa da fare da rimandare");
+      return;
+    }
+
+    setLoading(true);
+
+    const payload = daRimandare.map((c) => ({
+      elemento: c.elemento,
+      fatto: false,
+      data: dataDomani,
+    }));
+
+    await supabase.from("cose_da_fare").insert(payload);
+
+    setLoading(false);
+    alert("Cose da fare rimandate a domani");
+  };
+
   /* ================= GUARD ================= */
 
   if (!dataSelezionata) {
@@ -202,7 +233,7 @@ export default function CalendarioPersonaleEditPage() {
         <strong>Data:</strong> {formatDateEU(dataSelezionata)}
       </div>
 
-      {/* ================= EVENTI (INVARIATI) ================= */}
+      {/* EVENTI */}
 
       <h2 style={{ marginBottom: 12 }}>Nuovo appuntamento</h2>
 
@@ -301,7 +332,7 @@ export default function CalendarioPersonaleEditPage() {
         </tbody>
       </table>
 
-      {/* ================= COSE DA FARE (AGGIUNTA) ================= */}
+      {/* COSE DA FARE */}
 
       <h2 style={{ marginBottom: 12 }}>Aggiungi cosa da fare</h2>
 
@@ -364,6 +395,14 @@ export default function CalendarioPersonaleEditPage() {
         </tbody>
       </table>
 
+      {/* BOTTONE RIMANDA A DOMANI */}
+
+      <div style={{ marginTop: 32, marginBottom: 16 }}>
+        <button onClick={rimandaADomani} style={styles.saveButton}>
+          ⏭ Rimanda a domani
+        </button>
+      </div>
+
       <button
         style={styles.backButton}
         onClick={() => router.push("/admin/calendario_personale")}
@@ -376,7 +415,7 @@ export default function CalendarioPersonaleEditPage() {
   );
 }
 
-/* ================= STILI (IDENTICI) ================= */
+/* ================= STILI ================= */
 
 const styles: Record<string, React.CSSProperties> = {
   page: {

@@ -35,6 +35,14 @@ export default function AdminDashboard() {
 
   return (
     <main style={styles.page}>
+      {/* BOTTONE TORNA ALLA DASHBOARD */}
+      <button
+        style={styles.dashboardButton}
+        onClick={() => router.push("/admin/dashboard")}
+      >
+        ← Torna alla dashboard
+      </button>
+
       <h1>Dashboard area personale</h1>
 
       <div style={styles.grid}>
@@ -42,8 +50,6 @@ export default function AdminDashboard() {
           <h2>📅 Calendario personale</h2>
         </Link>
       </div>
-
-      
     </main>
   );
 }
@@ -54,6 +60,7 @@ const styles: Record<string, React.CSSProperties> = {
     padding: 40,
     background: "#f4f4f4",
     fontFamily: "sans-serif",
+    position: "relative",
   },
   grid: {
     display: "grid",
@@ -101,5 +108,20 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: 13,
     cursor: "pointer",
     opacity: 0.85,
+  },
+
+  /* === SOLO AGGIUNTO === */
+  dashboardButton: {
+    position: "absolute",
+    top: 24,
+    right: 40,
+    backgroundColor: "#111827",
+    color: "#ffffff",
+    border: "none",
+    borderRadius: 8,
+    padding: "10px 16px",
+    fontSize: 14,
+    fontWeight: 600,
+    cursor: "pointer",
   },
 };

@@ -113,6 +113,14 @@ export default function SalaProveCalendar() {
 
   return (
     <main style={styles.page}>
+      {/* BOTTONE DASHBOARD */}
+      <button
+        style={styles.dashboardButton}
+        onClick={() => router.push("/admin/dashboard")}
+      >
+        ← Torna alla dashboard
+      </button>
+
       <h1 style={styles.title}>Calendario</h1>
 
       {/* CONTROLLI */}
@@ -206,6 +214,7 @@ export default function SalaProveCalendar() {
 const styles: Record<string, React.CSSProperties> = {
   page: {
     padding: "32px",
+    position: "relative",
   },
 
   title: {
@@ -249,5 +258,20 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: 13,
     lineHeight: 1.3,
     color: "#000",
+  },
+
+  /* === SOLO AGGIUNTO === */
+  dashboardButton: {
+    position: "absolute",
+    top: 24,
+    right: 32,
+    backgroundColor: "#111827",
+    color: "#ffffff",
+    border: "none",
+    borderRadius: 8,
+    padding: "10px 16px",
+    fontSize: 14,
+    fontWeight: 600,
+    cursor: "pointer",
   },
 };
