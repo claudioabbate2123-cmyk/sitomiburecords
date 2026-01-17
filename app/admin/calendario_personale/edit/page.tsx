@@ -21,6 +21,12 @@ type Appuntamento = {
   nome_evento: string;
 };
 
+type CosaDaFare = {
+  id: number;
+  elemento: string;
+  fatto: boolean;
+};
+
 /* ================= COMPONENTE ================= */
 
 export default function CalendarioPersonaleEditPage() {
@@ -28,6 +34,7 @@ export default function CalendarioPersonaleEditPage() {
 
   const [dataSelezionata, setDataSelezionata] = useState<string | null>(null);
   const [eventi, setEventi] = useState<Appuntamento[]>([]);
+  const [coseDaFare, setCoseDaFare] = useState<CosaDaFare[]>([]);
   const [loading, setLoading] = useState(false);
 
   const [nuovoEvento, setNuovoEvento] = useState({
@@ -35,6 +42,10 @@ export default function CalendarioPersonaleEditPage() {
     ora_inizio: "",
     ora_fine: "",
     nome_evento: "",
+  });
+
+  const [nuovaCosaDaFare, setNuovaCosaDaFare] = useState({
+    elemento: "",
   });
 
   /* ================= LEGGI DATA DA LOCAL STORAGE ================= */
@@ -47,7 +58,7 @@ export default function CalendarioPersonaleEditPage() {
     setNuovoEvento((p) => ({ ...p, data }));
   }, []);
 
-  /* ================= LOAD EVENTI DEL GIORNO ================= */
+  /* ================= LOAD EVENTI ================= */
 
   const fetchEventi = async () => {
     if (!dataSelezionata) return;
@@ -61,11 +72,26 @@ export default function CalendarioPersonaleEditPage() {
     setEventi(data || []);
   };
 
+  /* ================= LOAD COSE DA FARE ================= */
+
+  const fetchCoseDaFare = async () => {
+    if (!dataSelezionata) return;
+
+    const { data } = await supabase
+      .from("cose_da_fare")
+      .select("id, elemento, fatto")
+      .eq("data", dataSelezionata)
+      .order("created_at");
+
+    setCoseDaFare(data || []);
+  };
+
   useEffect(() => {
     fetchEventi();
+    fetchCoseDaFare();
   }, [dataSelezionata]);
 
-  /* ================= UPDATE EVENTO ================= */
+  /* ================= UPDATE ================= */
 
   const updateEvento = async (
     id: number,
@@ -73,27 +99,46 @@ export default function CalendarioPersonaleEditPage() {
     value: string
   ) => {
     setLoading(true);
-
     await supabase
       .from("calendario_personale")
       .update({ [field]: value })
       .eq("id", id);
-
     setLoading(false);
   };
 
-  /* ================= DELETE EVENTO ================= */
+  const updateCosaDaFare = async (
+    id: number,
+    field: keyof CosaDaFare,
+    value: string | boolean
+  ) => {
+    setLoading(true);
+    await supabase
+      .from("cose_da_fare")
+      .update({ [field]: value })
+      .eq("id", id);
+    await fetchCoseDaFare();
+    setLoading(false);
+  };
+
+  /* ================= DELETE ================= */
 
   const eliminaEvento = async (id: number) => {
     if (!confirm("Eliminare questo appuntamento?")) return;
-
     setLoading(true);
     await supabase.from("calendario_personale").delete().eq("id", id);
     await fetchEventi();
     setLoading(false);
   };
 
-  /* ================= CREATE EVENTO ================= */
+  const eliminaCosaDaFare = async (id: number) => {
+    if (!confirm("Eliminare questa cosa da fare?")) return;
+    setLoading(true);
+    await supabase.from("cose_da_fare").delete().eq("id", id);
+    await fetchCoseDaFare();
+    setLoading(false);
+  };
+
+  /* ================= CREATE ================= */
 
   const salvaNuovoEvento = async () => {
     if (
@@ -106,22 +151,7 @@ export default function CalendarioPersonaleEditPage() {
     }
 
     setLoading(true);
-
-    const { error } = await supabase
-      .from("calendario_personale")
-      .insert({
-        data: nuovoEvento.data,
-        ora_inizio: nuovoEvento.ora_inizio,
-        ora_fine: nuovoEvento.ora_fine,
-        nome_evento: nuovoEvento.nome_evento,
-      });
-
-    if (error) {
-      alert("Errore salvataggio: " + error.message);
-      setLoading(false);
-      return;
-    }
-
+    await supabase.from("calendario_personale").insert(nuovoEvento);
     await fetchEventi();
 
     setNuovoEvento((p) => ({
@@ -131,6 +161,23 @@ export default function CalendarioPersonaleEditPage() {
       nome_evento: "",
     }));
 
+    setLoading(false);
+  };
+
+  const salvaCosaDaFare = async () => {
+    if (!nuovaCosaDaFare.elemento || !dataSelezionata) {
+      alert("Compila il campo");
+      return;
+    }
+
+    setLoading(true);
+    await supabase.from("cose_da_fare").insert({
+      elemento: nuovaCosaDaFare.elemento,
+      data: dataSelezionata,
+      fatto: false,
+    });
+    await fetchCoseDaFare();
+    setNuovaCosaDaFare({ elemento: "" });
     setLoading(false);
   };
 
@@ -155,6 +202,8 @@ export default function CalendarioPersonaleEditPage() {
         <strong>Data:</strong> {formatDateEU(dataSelezionata)}
       </div>
 
+      {/* ================= EVENTI (INVARIATI) ================= */}
+
       <h2 style={{ marginBottom: 12 }}>Nuovo appuntamento</h2>
 
       <div style={styles.newBookingRow}>
@@ -162,14 +211,9 @@ export default function CalendarioPersonaleEditPage() {
           <label style={styles.label}>Nome evento</label>
           <input
             style={styles.input}
-            type="text"
-            placeholder="Nome evento"
             value={nuovoEvento.nome_evento}
             onChange={(e) =>
-              setNuovoEvento({
-                ...nuovoEvento,
-                nome_evento: e.target.value,
-              })
+              setNuovoEvento({ ...nuovoEvento, nome_evento: e.target.value })
             }
           />
         </div>
@@ -181,10 +225,7 @@ export default function CalendarioPersonaleEditPage() {
             type="time"
             value={nuovoEvento.ora_inizio}
             onChange={(e) =>
-              setNuovoEvento({
-                ...nuovoEvento,
-                ora_inizio: e.target.value,
-              })
+              setNuovoEvento({ ...nuovoEvento, ora_inizio: e.target.value })
             }
           />
         </div>
@@ -196,10 +237,7 @@ export default function CalendarioPersonaleEditPage() {
             type="time"
             value={nuovoEvento.ora_fine}
             onChange={(e) =>
-              setNuovoEvento({
-                ...nuovoEvento,
-                ora_fine: e.target.value,
-              })
+              setNuovoEvento({ ...nuovoEvento, ora_fine: e.target.value })
             }
           />
         </div>
@@ -209,7 +247,6 @@ export default function CalendarioPersonaleEditPage() {
         💾 Salva appuntamento
       </button>
 
-      {/* ================= TABELLA EVENTI ================= */}
       <table style={styles.table}>
         <thead>
           <tr>
@@ -224,7 +261,6 @@ export default function CalendarioPersonaleEditPage() {
             <tr key={e.id}>
               <td style={styles.td}>
                 <input
-                  type="text"
                   style={styles.input}
                   defaultValue={e.nome_evento}
                   onBlur={(ev) =>
@@ -232,32 +268,92 @@ export default function CalendarioPersonaleEditPage() {
                   }
                 />
               </td>
-
               <td style={styles.td}>
                 <input
-                  type="time"
                   style={styles.input}
+                  type="time"
                   defaultValue={e.ora_inizio.slice(0, 5)}
                   onBlur={(ev) =>
                     updateEvento(e.id, "ora_inizio", ev.target.value)
                   }
                 />
               </td>
-
               <td style={styles.td}>
                 <input
-                  type="time"
                   style={styles.input}
+                  type="time"
                   defaultValue={e.ora_fine.slice(0, 5)}
                   onBlur={(ev) =>
                     updateEvento(e.id, "ora_fine", ev.target.value)
                   }
                 />
               </td>
-
               <td style={{ ...styles.td, textAlign: "center" }}>
                 <button
                   onClick={() => eliminaEvento(e.id)}
+                  style={styles.deleteButton}
+                >
+                  ✕
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
+      {/* ================= COSE DA FARE (AGGIUNTA) ================= */}
+
+      <h2 style={{ marginBottom: 12 }}>Aggiungi cosa da fare</h2>
+
+      <div style={styles.newBookingRow}>
+        <div style={styles.field}>
+          <label style={styles.label}>Descrizione</label>
+          <input
+            style={styles.input}
+            value={nuovaCosaDaFare.elemento}
+            onChange={(e) =>
+              setNuovaCosaDaFare({ elemento: e.target.value })
+            }
+          />
+        </div>
+      </div>
+
+      <button onClick={salvaCosaDaFare} style={styles.saveButton}>
+        💾 Salva cosa da fare
+      </button>
+
+      <table style={styles.table}>
+        <thead>
+          <tr>
+            <th style={styles.th}>Descrizione</th>
+            <th style={styles.th}>Fatto</th>
+            <th style={styles.th}>Azioni</th>
+          </tr>
+        </thead>
+        <tbody>
+          {coseDaFare.map((c) => (
+            <tr key={c.id}>
+              <td style={styles.td}>
+                <input
+                  style={styles.input}
+                  defaultValue={c.elemento}
+                  onBlur={(e) =>
+                    updateCosaDaFare(c.id, "elemento", e.target.value)
+                  }
+                />
+              </td>
+              <td style={{ ...styles.td, textAlign: "center" }}>
+                <input
+                  type="checkbox"
+                  checked={c.fatto}
+                  onChange={(e) =>
+                    updateCosaDaFare(c.id, "fatto", e.target.checked)
+                  }
+                />
+              </td>
+              <td style={{ ...styles.td, textAlign: "center" }}>
+                <button
+                  onClick={() => eliminaCosaDaFare(c.id)}
                   style={styles.deleteButton}
                 >
                   ✕
@@ -330,14 +426,11 @@ const styles: Record<string, React.CSSProperties> = {
   },
   td: {
     padding: "8px",
-    verticalAlign: "top",
   },
   input: {
     width: "100%",
     padding: "6px 8px",
     fontSize: 14,
-    backgroundColor: "#fff",
-    color: "#111",
     border: "1px solid #ccc",
     borderRadius: 4,
   },
