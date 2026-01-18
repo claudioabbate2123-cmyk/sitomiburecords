@@ -25,6 +25,14 @@ type CosaDaFare = {
   id: number;
   elemento: string;
   fatto: boolean;
+  categoria?: string | null;
+  dirty?: boolean;
+};
+
+
+type Categoria = {
+  id: number;
+  nome: string;
 };
 
 /* ================= COMPONENTE ================= */
@@ -35,6 +43,7 @@ export default function CalendarioPersonaleEditPage() {
   const [dataSelezionata, setDataSelezionata] = useState<string | null>(null);
   const [eventi, setEventi] = useState<Appuntamento[]>([]);
   const [coseDaFare, setCoseDaFare] = useState<CosaDaFare[]>([]);
+  const [categorie, setCategorie] = useState<Categoria[]>([]);
   const [loading, setLoading] = useState(false);
 
   const [nuovoEvento, setNuovoEvento] = useState({
@@ -46,6 +55,7 @@ export default function CalendarioPersonaleEditPage() {
 
   const [nuovaCosaDaFare, setNuovaCosaDaFare] = useState({
     elemento: "",
+    categoria: "",
   });
 
   /* ================= LEGGI DATA DA LOCAL STORAGE ================= */
@@ -79,16 +89,31 @@ export default function CalendarioPersonaleEditPage() {
 
     const { data } = await supabase
       .from("cose_da_fare")
-      .select("id, elemento, fatto")
+      .select("id, elemento, fatto, categoria")
       .eq("data", dataSelezionata)
       .order("created_at");
 
     setCoseDaFare(data || []);
   };
 
+  /* ================= LOAD CATEGORIE ================= */
+
+  const fetchCategorie = async () => {
+    const { data } = await supabase
+      .from("categorie_cose_da_fare")
+      .select("id, nome")
+      .order("nome");
+
+    setCategorie(data || []);
+  };
   useEffect(() => {
     fetchEventi();
+}, [dataSelezionata]);
+
+  useEffect(() => {
+    
     fetchCoseDaFare();
+    fetchCategorie();
   }, [dataSelezionata]);
 
   /* ================= UPDATE ================= */
@@ -138,6 +163,71 @@ export default function CalendarioPersonaleEditPage() {
     setLoading(false);
   };
 
+  /* ================= UPDATE CATEGORIA================= */
+  const updateCategoriaCosaDaFare = async (
+  id: number,
+  categoria: string
+) => {
+  setLoading(true);
+
+  if (categoria) {
+    const { data: categoriaEsistente } = await supabase
+      .from("categorie_cose_da_fare")
+      .select("id")
+      .eq("nome", categoria)
+      .maybeSingle();
+
+    if (!categoriaEsistente) {
+      await supabase.from("categorie_cose_da_fare").insert({
+        nome: categoria,
+      });
+    }
+  }
+
+  await supabase
+    .from("cose_da_fare")
+    .update({ categoria: categoria || null })
+    .eq("id", id);
+
+  await fetchCategorie();
+  await fetchCoseDaFare();
+
+  setLoading(false);
+};
+    /*==============  SALVA COSA DA FARE    ==========*/ 
+    const salvaCosaDaFareModificata = async (cosa: CosaDaFare) => {
+        setLoading(true);
+
+        if (cosa.categoria) {
+          const { data: categoriaEsistente } = await supabase
+            .from("categorie_cose_da_fare")
+            .select("id")
+            .eq("nome", cosa.categoria)
+            .maybeSingle();
+
+          if (!categoriaEsistente) {
+            await supabase.from("categorie_cose_da_fare").insert({
+              nome: cosa.categoria,
+            });
+          }
+        }
+
+        await supabase
+          .from("cose_da_fare")
+          .update({
+            elemento: cosa.elemento,
+            fatto: cosa.fatto,
+            categoria: cosa.categoria || null,
+          })
+          .eq("id", cosa.id);
+
+        await fetchCategorie();
+        await fetchCoseDaFare();
+
+        setLoading(false);
+};
+
+
   /* ================= CREATE ================= */
 
   const salvaNuovoEvento = async () => {
@@ -171,13 +261,31 @@ export default function CalendarioPersonaleEditPage() {
     }
 
     setLoading(true);
+
+    if (nuovaCosaDaFare.categoria) {
+      const { data: categoriaEsistente } = await supabase
+        .from("categorie_cose_da_fare")
+        .select("id")
+        .eq("nome", nuovaCosaDaFare.categoria)
+        .maybeSingle();
+
+      if (!categoriaEsistente) {
+        await supabase.from("categorie_cose_da_fare").insert({
+          nome: nuovaCosaDaFare.categoria,
+        });
+      }
+    }
+
     await supabase.from("cose_da_fare").insert({
       elemento: nuovaCosaDaFare.elemento,
       data: dataSelezionata,
       fatto: false,
+      categoria: nuovaCosaDaFare.categoria || null,
     });
+
     await fetchCoseDaFare();
-    setNuovaCosaDaFare({ elemento: "" });
+    await fetchCategorie();
+    setNuovaCosaDaFare({ elemento: "", categoria: "" });
     setLoading(false);
   };
 
@@ -204,6 +312,7 @@ export default function CalendarioPersonaleEditPage() {
       elemento: c.elemento,
       fatto: false,
       data: dataDomani,
+      categoria: c.categoria || null,
     }));
 
     await supabase.from("cose_da_fare").insert(payload);
@@ -277,60 +386,61 @@ export default function CalendarioPersonaleEditPage() {
       <button onClick={salvaNuovoEvento} style={styles.saveButton}>
         💾 Salva appuntamento
       </button>
-
+      {/*APPUNTAMENTI SELECT UPDATE DELETE */}
       <table style={styles.table}>
-        <thead>
-          <tr>
-            <th style={styles.th}>Nome evento</th>
-            <th style={styles.th}>Ora inizio</th>
-            <th style={styles.th}>Ora fine</th>
-            <th style={styles.th}>Azioni</th>
-          </tr>
-        </thead>
-        <tbody>
-          {eventi.map((e) => (
-            <tr key={e.id}>
-              <td style={styles.td}>
-                <input
-                  style={styles.input}
-                  defaultValue={e.nome_evento}
-                  onBlur={(ev) =>
-                    updateEvento(e.id, "nome_evento", ev.target.value)
-                  }
-                />
-              </td>
-              <td style={styles.td}>
-                <input
-                  style={styles.input}
-                  type="time"
-                  defaultValue={e.ora_inizio.slice(0, 5)}
-                  onBlur={(ev) =>
-                    updateEvento(e.id, "ora_inizio", ev.target.value)
-                  }
-                />
-              </td>
-              <td style={styles.td}>
-                <input
-                  style={styles.input}
-                  type="time"
-                  defaultValue={e.ora_fine.slice(0, 5)}
-                  onBlur={(ev) =>
-                    updateEvento(e.id, "ora_fine", ev.target.value)
-                  }
-                />
-              </td>
-              <td style={{ ...styles.td, textAlign: "center" }}>
-                <button
-                  onClick={() => eliminaEvento(e.id)}
-                  style={styles.deleteButton}
-                >
-                  ✕
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+  <thead>
+    <tr>
+      <th style={styles.th}>Nome evento</th>
+      <th style={styles.th}>Ora inizio</th>
+      <th style={styles.th}>Ora fine</th>
+      <th style={styles.th}>Azioni</th>
+    </tr>
+  </thead>
+  <tbody>
+    {eventi.map((e) => (
+      <tr key={e.id}>
+        <td style={styles.td}>
+          <input
+            style={styles.input}
+            defaultValue={e.nome_evento}
+            onBlur={(ev) =>
+              updateEvento(e.id, "nome_evento", ev.target.value)
+            }
+          />
+        </td>
+        <td style={styles.td}>
+          <input
+            style={styles.input}
+            type="time"
+            defaultValue={e.ora_inizio.slice(0, 5)}
+            onBlur={(ev) =>
+              updateEvento(e.id, "ora_inizio", ev.target.value)
+            }
+          />
+        </td>
+        <td style={styles.td}>
+          <input
+            style={styles.input}
+            type="time"
+            defaultValue={e.ora_fine.slice(0, 5)}
+            onBlur={(ev) =>
+              updateEvento(e.id, "ora_fine", ev.target.value)
+            }
+          />
+        </td>
+        <td style={{ ...styles.td, textAlign: "center" }}>
+          <button
+            onClick={() => eliminaEvento(e.id)}
+            style={styles.deleteButton}
+          >
+            ✕
+          </button>
+        </td>
+      </tr>
+    ))}
+  </tbody>
+</table>
+
 
       {/* COSE DA FARE */}
 
@@ -343,9 +453,32 @@ export default function CalendarioPersonaleEditPage() {
             style={styles.input}
             value={nuovaCosaDaFare.elemento}
             onChange={(e) =>
-              setNuovaCosaDaFare({ elemento: e.target.value })
+              setNuovaCosaDaFare({
+                ...nuovaCosaDaFare,
+                elemento: e.target.value,
+              })
             }
           />
+        </div>
+
+        <div style={styles.field}>
+          <label style={styles.label}>Categoria</label>
+          <input
+            style={styles.input}
+            list="categorie-list"
+            value={nuovaCosaDaFare.categoria}
+            onChange={(e) =>
+              setNuovaCosaDaFare({
+                ...nuovaCosaDaFare,
+                categoria: e.target.value,
+              })
+            }
+          />
+          <datalist id="categorie-list">
+            {categorie.map((c) => (
+              <option key={c.id} value={c.nome} />
+            ))}
+          </datalist>
         </div>
       </div>
 
@@ -358,6 +491,7 @@ export default function CalendarioPersonaleEditPage() {
           <tr>
             <th style={styles.th}>Descrizione</th>
             <th style={styles.th}>Fatto</th>
+            <th style={styles.th}>Categoria</th>
             <th style={styles.th}>Azioni</th>
           </tr>
         </thead>
@@ -365,24 +499,90 @@ export default function CalendarioPersonaleEditPage() {
           {coseDaFare.map((c) => (
             <tr key={c.id}>
               <td style={styles.td}>
-                <input
-                  style={styles.input}
-                  defaultValue={c.elemento}
-                  onBlur={(e) =>
-                    updateCosaDaFare(c.id, "elemento", e.target.value)
+               <textarea
+                  ref={(el) => {
+                    if (el) {
+                      el.style.height = "auto";
+                      el.style.height = el.scrollHeight + "px";
+                    }
+                  }}
+                  style={{
+                    ...styles.input,
+                    resize: "none",
+                    overflow: "hidden",
+                  }}
+                  value={c.elemento}
+                  onInput={(e) => {
+                    const target = e.target as HTMLTextAreaElement;
+                    target.style.height = "auto";
+                    target.style.height = target.scrollHeight + "px";
+                  }}
+                  onChange={(e) =>
+                    setCoseDaFare((prev) =>
+                      prev.map((item) =>
+                        item.id === c.id
+                          ? { ...item, elemento: e.target.value, dirty: true }
+                          : item
+                      )
+                    )
                   }
-                />
+/>
+
+
               </td>
               <td style={{ ...styles.td, textAlign: "center" }}>
                 <input
                   type="checkbox"
                   checked={c.fatto}
                   onChange={(e) =>
-                    updateCosaDaFare(c.id, "fatto", e.target.checked)
-                  }
+                    setCoseDaFare((prev) =>
+                      prev.map((item) =>
+                        item.id === c.id
+                          ? { ...item, fatto: e.target.checked, dirty: true }
+                          : item
+                      )
+                    )
+                  } 
                 />
+
+
+              </td>
+              <td style={styles.td}>
+                <input
+                      style={styles.input}
+                      list="categorie-list"
+                      value={c.categoria || ""}
+                      onChange={(e) =>
+                        setCoseDaFare((prev) =>
+                          prev.map((item) =>
+                            item.id === c.id
+                              ? {
+                                  ...item,
+                                  categoria: e.target.value,
+                                  dirty: true,
+                                }
+                              : item
+                          )
+                        )
+                      }
+                    />
+
+
               </td>
               <td style={{ ...styles.td, textAlign: "center" }}>
+                {c.dirty && (
+                  <button
+                    onClick={() => salvaCosaDaFareModificata(c)}
+                    style={{
+                      ...styles.saveButton,
+                      padding: "4px 10px",
+                      marginRight: 8,
+                    }}
+                  >
+                    💾
+                  </button>
+                )}
+
                 <button
                   onClick={() => eliminaCosaDaFare(c.id)}
                   style={styles.deleteButton}
@@ -390,12 +590,11 @@ export default function CalendarioPersonaleEditPage() {
                   ✕
                 </button>
               </td>
+
             </tr>
           ))}
         </tbody>
       </table>
-
-      {/* BOTTONE RIMANDA A DOMANI */}
 
       <div style={{ marginTop: 32, marginBottom: 16 }}>
         <button onClick={rimandaADomani} style={styles.saveButton}>
@@ -465,6 +664,7 @@ const styles: Record<string, React.CSSProperties> = {
   },
   td: {
     padding: "8px",
+    verticalAlign: "top",
   },
   input: {
     width: "100%",
@@ -472,6 +672,7 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: 14,
     border: "1px solid #ccc",
     borderRadius: 4,
+    fontFamily: "inherit",
   },
   saveButton: {
     backgroundColor: "#16a34a",
