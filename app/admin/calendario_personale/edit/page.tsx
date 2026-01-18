@@ -45,6 +45,8 @@ export default function CalendarioPersonaleEditPage() {
   const [coseDaFare, setCoseDaFare] = useState<CosaDaFare[]>([]);
   const [categorie, setCategorie] = useState<Categoria[]>([]);
   const [loading, setLoading] = useState(false);
+  const [categoriaFiltro, setCategoriaFiltro] = useState<string>("tutte");
+
 
   const [nuovoEvento, setNuovoEvento] = useState({
     data: "",
@@ -221,12 +223,68 @@ export default function CalendarioPersonaleEditPage() {
           })
           .eq("id", cosa.id);
 
-        await fetchCategorie();
-        await fetchCoseDaFare();
+        // 🔑 aggiorna SOLO lo stato locale di quella riga
+          setCoseDaFare((prev) =>
+            prev.map((item) =>
+              item.id === cosa.id
+                ? { ...item, dirty: false }
+                : item
+            )
+          );
 
-        setLoading(false);
+          // le categorie possono cambiare → aggiorniamo solo quelle
+          await fetchCategorie();
+
+          setLoading(false);
 };
 
+/*==============  SALVA TUTTE LE MODIFICHE  ==========*/
+const salvaTutteLeModifiche = async () => {
+  const daSalvare = coseDaFare.filter((c) => c.dirty);
+
+  if (daSalvare.length === 0) {
+    alert("Nessuna modifica da salvare");
+    return;
+  }
+
+  setLoading(true);
+
+  for (const cosa of daSalvare) {
+    // crea categoria se non esiste
+    if (cosa.categoria) {
+      const { data: categoriaEsistente } = await supabase
+        .from("categorie_cose_da_fare")
+        .select("id")
+        .eq("nome", cosa.categoria)
+        .maybeSingle();
+
+      if (!categoriaEsistente) {
+        await supabase.from("categorie_cose_da_fare").insert({
+          nome: cosa.categoria,
+        });
+      }
+    }
+
+    await supabase
+      .from("cose_da_fare")
+      .update({
+        elemento: cosa.elemento,
+        fatto: cosa.fatto,
+        categoria: cosa.categoria || null,
+      })
+      .eq("id", cosa.id);
+  }
+
+  // 🔑 pulisce TUTTE le righe salvate
+  setCoseDaFare((prev) =>
+    prev.map((item) =>
+      item.dirty ? { ...item, dirty: false } : item
+    )
+  );
+
+  await fetchCategorie();
+  setLoading(false);
+};
 
   /* ================= CREATE ================= */
 
@@ -485,6 +543,26 @@ export default function CalendarioPersonaleEditPage() {
       <button onClick={salvaCosaDaFare} style={styles.saveButton}>
         💾 Salva cosa da fare
       </button>
+      <div style={{ marginBottom: 16, maxWidth: 300 }}>
+          <label style={{ ...styles.label, marginBottom: 6 }}>
+            Scegli categoria cose da fare
+          </label>
+
+          <select
+            value={categoriaFiltro}
+            onChange={(e) => setCategoriaFiltro(e.target.value)}
+            style={styles.input}
+          >
+            <option value="tutte">Tutte le categorie</option>
+
+            {categorie.map((c) => (
+              <option key={c.id} value={c.nome}>
+                {c.nome}
+              </option>
+            ))}
+          </select>
+        </div>
+
 
       <table style={styles.table}>
         <thead>
@@ -496,7 +574,14 @@ export default function CalendarioPersonaleEditPage() {
           </tr>
         </thead>
         <tbody>
-          {coseDaFare.map((c) => (
+         {coseDaFare
+            .filter((c) =>
+              categoriaFiltro === "tutte"
+                ? true
+                : c.categoria === categoriaFiltro
+            )
+            .map((c) => (
+
             <tr key={c.id}>
               <td style={styles.td}>
                <textarea
@@ -596,11 +681,32 @@ export default function CalendarioPersonaleEditPage() {
         </tbody>
       </table>
 
-      <div style={{ marginTop: 32, marginBottom: 16 }}>
+      <div
+        style={{
+          marginTop: 32,
+          marginBottom: 16,
+          display: "flex",
+          gap: 12,
+          justifyContent: "flex-end",
+        }}
+      >
         <button onClick={rimandaADomani} style={styles.saveButton}>
           ⏭ Rimanda a domani
         </button>
+
+        {coseDaFare.some((c) => c.dirty) && (
+          <button
+            onClick={salvaTutteLeModifiche}
+            style={{
+              ...styles.saveButton,
+              backgroundColor: "#2563eb",
+            }}
+          >
+            💾 Salva tutte le modifiche
+          </button>
+        )}
       </div>
+
 
       <button
         style={styles.backButton}
