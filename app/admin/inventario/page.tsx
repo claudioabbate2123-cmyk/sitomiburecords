@@ -18,7 +18,6 @@ type Attrezzatura = {
   nome: string;
   image_url: string | null;
   categoria: string | null;
-  stato: boolean;
   note: string | null;
   dirty?: boolean;
 };
@@ -41,7 +40,6 @@ export default function AttrezzaturaPage() {
     nome: "",
     image_url: "",
     categoria: "",
-    stato: true,
     note: "",
   });
 
@@ -50,7 +48,7 @@ export default function AttrezzaturaPage() {
   const fetchItems = async () => {
     const { data } = await supabase
       .from("attrezzatura")
-      .select("id, nome, image_url, categoria, stato, note")
+      .select("id, nome, image_url, categoria, note")
       .order("created_at");
 
     setItems(data || []);
@@ -103,7 +101,6 @@ export default function AttrezzaturaPage() {
       nome: nuova.nome,
       image_url: nuova.image_url || null,
       categoria: nuova.categoria || null,
-      stato: nuova.stato,
       note: nuova.note || null,
     });
 
@@ -111,7 +108,6 @@ export default function AttrezzaturaPage() {
       nome: "",
       image_url: "",
       categoria: "",
-      stato: true,
       note: "",
     });
 
@@ -132,7 +128,6 @@ export default function AttrezzaturaPage() {
         nome: item.nome,
         image_url: item.image_url,
         categoria: item.categoria,
-        stato: item.stato,
         note: item.note,
       })
       .eq("id", item.id);
@@ -161,7 +156,6 @@ export default function AttrezzaturaPage() {
           nome: i.nome,
           image_url: i.image_url,
           categoria: i.categoria,
-          stato: i.stato,
           note: i.note,
         })
         .eq("id", i.id);
@@ -252,7 +246,6 @@ export default function AttrezzaturaPage() {
         <thead>
           <tr>
             <th style={styles.th}>Nome</th>
-            <th style={styles.th}>Stato</th>
             <th style={styles.th}>Categoria</th>
             <th style={styles.th}>Note</th>
             <th style={styles.th}>Azioni</th>
@@ -269,11 +262,7 @@ export default function AttrezzaturaPage() {
                     setItems((prev) =>
                       prev.map((x) =>
                         x.id === i.id
-                          ? {
-                              ...x,
-                              nome: e.target.value,
-                              dirty: true,
-                            }
+                          ? { ...x, nome: e.target.value, dirty: true }
                           : x
                       )
                     )
@@ -287,26 +276,6 @@ export default function AttrezzaturaPage() {
                 )}
               </td>
 
-              <td style={{ ...styles.td, textAlign: "center" }}>
-                <input
-                  type="checkbox"
-                  checked={i.stato}
-                  onChange={(e) =>
-                    setItems((prev) =>
-                      prev.map((x) =>
-                        x.id === i.id
-                          ? {
-                              ...x,
-                              stato: e.target.checked,
-                              dirty: true,
-                            }
-                          : x
-                      )
-                    )
-                  }
-                />
-              </td>
-
               <td style={styles.td}>
                 <input
                   style={styles.input}
@@ -316,11 +285,7 @@ export default function AttrezzaturaPage() {
                     setItems((prev) =>
                       prev.map((x) =>
                         x.id === i.id
-                          ? {
-                              ...x,
-                              categoria: e.target.value,
-                              dirty: true,
-                            }
+                          ? { ...x, categoria: e.target.value, dirty: true }
                           : x
                       )
                     )
@@ -336,11 +301,7 @@ export default function AttrezzaturaPage() {
                     setItems((prev) =>
                       prev.map((x) =>
                         x.id === i.id
-                          ? {
-                              ...x,
-                              note: e.target.value,
-                              dirty: true,
-                            }
+                          ? { ...x, note: e.target.value, dirty: true }
                           : x
                       )
                     )

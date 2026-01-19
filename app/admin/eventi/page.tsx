@@ -15,6 +15,7 @@ type Evento = {
   data_inizio: string;
   data_fine: string | null;
   note: string | null;
+  dirty?: boolean;
 };
 
 export default function EventiPage() {
@@ -27,6 +28,9 @@ export default function EventiPage() {
   const [dataFine, setDataFine] = useState("");
   const [note, setNote] = useState("");
 
+  const [dataFiltroDa, setDataFiltroDa] = useState("");
+  const [dataFiltroA, setDataFiltroA] = useState("");
+
   useEffect(() => {
     checkSession();
     loadEventi();
@@ -38,35 +42,87 @@ export default function EventiPage() {
   }
 
   async function loadEventi() {
-    const { data, error } = await supabase
+    const { data } = await supabase
       .from("eventi")
       .select("*")
       .order("data_inizio", { ascending: false });
 
-    if (!error && data) setEventi(data);
+    if (data) setEventi(data);
     setLoading(false);
   }
 
   async function creaEvento(e: React.FormEvent) {
     e.preventDefault();
 
-    const { error } = await supabase.from("eventi").insert({
+    await supabase.from("eventi").insert({
       nome,
       data_inizio: dataInizio,
       data_fine: dataFine || null,
       note,
     });
 
-    if (error) {
-      alert(error.message);
-      return;
-    }
-
     setNome("");
     setDataInizio("");
     setDataFine("");
     setNote("");
     loadEventi();
+  }
+
+  /* ================= FILTRO ================= */
+
+  const eventiFiltrati = eventi.filter((evento) => {
+    const t = new Date(evento.data_inizio).getTime();
+
+    if (dataFiltroDa && t < new Date(dataFiltroDa).getTime()) return false;
+    if (dataFiltroA && t > new Date(dataFiltroA).getTime()) return false;
+
+    return true;
+  });
+
+  /* ================= UPDATE ================= */
+
+  async function salvaEvento(evento: Evento) {
+    await supabase
+      .from("eventi")
+      .update({
+        nome: evento.nome,
+        data_inizio: evento.data_inizio,
+        data_fine: evento.data_fine,
+      })
+      .eq("id", evento.id);
+
+    setEventi((prev) =>
+      prev.map((e) =>
+        e.id === evento.id ? { ...e, dirty: false } : e
+      )
+    );
+  }
+
+  async function salvaTutti() {
+    const modificati = eventi.filter((e) => e.dirty);
+    if (!modificati.length) return;
+
+    for (const e of modificati) {
+      await supabase
+        .from("eventi")
+        .update({
+          nome: e.nome,
+          data_inizio: e.data_inizio,
+          data_fine: e.data_fine,
+        })
+        .eq("id", e.id);
+    }
+
+    setEventi((prev) => prev.map((e) => ({ ...e, dirty: false })));
+  }
+
+  /* ================= DELETE ================= */
+
+  async function eliminaEvento(id: string) {
+    if (!confirm("Eliminare questo evento?")) return;
+
+    await supabase.from("eventi").delete().eq("id", id);
+    setEventi((prev) => prev.filter((e) => e.id !== id));
   }
 
   return (
@@ -128,10 +184,32 @@ export default function EventiPage() {
       <section style={styles.card}>
         <h2>Eventi esistenti</h2>
 
+        <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
+          <input
+            type="date"
+            value={dataFiltroDa}
+            onChange={(e) => setDataFiltroDa(e.target.value)}
+            style={styles.input}
+          />
+          <input
+            type="date"
+            value={dataFiltroA}
+            onChange={(e) => setDataFiltroA(e.target.value)}
+            style={styles.input}
+          />
+          <button
+            onClick={() => {
+              setDataFiltroDa("");
+              setDataFiltroA("");
+            }}
+            style={styles.button}
+          >
+            Reset
+          </button>
+        </div>
+
         {loading ? (
           <p>Caricamento...</p>
-        ) : eventi.length === 0 ? (
-          <p>Nessun evento creato</p>
         ) : (
           <table style={styles.table}>
             <thead>
@@ -143,25 +221,105 @@ export default function EventiPage() {
               </tr>
             </thead>
             <tbody>
-              {eventi.map((evento) => (
-                <tr key={evento.id}>
-                  <td style={styles.td}>{evento.nome}</td>
-                  <td style={styles.td}>{evento.data_inizio}</td>
-                  <td style={styles.td}>{evento.data_fine ?? "-"}</td>
+              {eventiFiltrati.map((e) => (
+                <tr key={e.id}>
                   <td style={styles.td}>
-                    <button
-                      style={styles.open}
-                      onClick={() =>
-                        router.push(`/admin/eventi/${evento.id}`)
+                    <input
+                      style={styles.input}
+                      value={e.nome}
+                      onChange={(ev) =>
+                        setEventi((prev) =>
+                          prev.map((x) =>
+                            x.id === e.id
+                              ? { ...x, nome: ev.target.value, dirty: true }
+                              : x
+                          )
+                        )
                       }
+                    />
+                  </td>
+
+                  <td style={styles.td}>
+                    <input
+                      type="date"
+                      value={e.data_inizio}
+                      onChange={(ev) =>
+                        setEventi((prev) =>
+                          prev.map((x) =>
+                            x.id === e.id
+                              ? {
+                                  ...x,
+                                  data_inizio: ev.target.value,
+                                  dirty: true,
+                                }
+                              : x
+                          )
+                        )
+                      }
+                      style={styles.input}
+                    />
+                  </td>
+
+                  <td style={styles.td}>
+                    <input
+                      type="date"
+                      value={e.data_fine || ""}
+                      onChange={(ev) =>
+                        setEventi((prev) =>
+                          prev.map((x) =>
+                            x.id === e.id
+                              ? {
+                                  ...x,
+                                  data_fine: ev.target.value || null,
+                                  dirty: true,
+                                }
+                              : x
+                          )
+                        )
+                      }
+                      style={styles.input}
+                    />
+                  </td>
+
+                  <td style={styles.td}>
+                    {e.dirty && (
+                      <button
+                        onClick={() => salvaEvento(e)}
+                        style={styles.open}
+                      >
+                        💾
+                      </button>
+                    )}
+
+                    <button
+                      onClick={() =>
+                        router.push(`/admin/eventi/${e.id}`)
+                      }
+                      style={styles.open}
                     >
                       Apri
+                    </button>
+
+                    <button
+                      onClick={() => eliminaEvento(e.id)}
+                      style={{ ...styles.open, background: "#ef4444" }}
+                    >
+                      ✕
                     </button>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
+        )}
+
+        {eventi.some((e) => e.dirty) && (
+          <button
+            onClick={salvaTutti}
+            style={{ ...styles.button, marginTop: 16 }}
+          >
+            💾 Salva tutte le modifiche
+          </button>
         )}
       </section>
     </main>
