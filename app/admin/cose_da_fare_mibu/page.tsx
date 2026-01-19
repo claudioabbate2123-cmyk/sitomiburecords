@@ -380,34 +380,34 @@ export default function CoseDaFareMibuPage() {
       {loading && <p>Salvataggio…</p>}
 
         <div style={{ marginTop: 48, display: "flex", gap: 12 }}>
-            <button
-                onClick={() => router.push("/admin/categorie_cose_da_fare_mibu")}
-                style={{
-                backgroundColor: "#2563eb",
-                color: "#fff",
-                padding: "8px 14px",
-                borderRadius: 6,
-                border: "none",
-                cursor: "pointer",
-                }}
-            >
-                ⚙️ Gestisci categorie
-            </button>
+        <button
+            onClick={() => router.push("/admin/categorie_cose_da_fare_mibu")}
+            style={{
+            backgroundColor: "#2563eb",
+            color: "#fff",
+            padding: "8px 14px",
+            borderRadius: 6,
+            border: "none",
+            cursor: "pointer",
+            }}
+        >
+            ⚙️ Gestisci categorie
+        </button>
 
-            <button
-                onClick={() => router.back()}
-                style={{
-                backgroundColor: "#e5e7eb",
-                color: "#111827",
-                padding: "8px 14px",
-                borderRadius: 6,
-                border: "1px solid #d1d5db",
-                cursor: "pointer",
-                }}
-            >
-                ← Torna indietro
-            </button>
-            </div>
+        <button
+            onClick={() => router.back()}
+            style={{
+            backgroundColor: "#e5e7eb",
+            color: "#111827",
+            padding: "8px 14px",
+            borderRadius: 6,
+            border: "1px solid #d1d5db",
+            cursor: "pointer",
+            }}
+        >
+            ← Torna indietro
+        </button>
+        </div>
 
     </main>
 

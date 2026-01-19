@@ -25,7 +25,6 @@ export default function AdminContatti() {
 
   useEffect(() => {
     async function loadData() {
-      // 🔐 Controllo sessione
       const { data } = await supabase.auth.getSession();
 
       if (!data.session) {
@@ -33,15 +32,12 @@ export default function AdminContatti() {
         return;
       }
 
-      // 📩 Lettura tabella Contatto
       const { data: contatti, error } = await supabase
         .from("Contatto")
         .select("*")
         .order("created_at", { ascending: false });
 
-      if (error) {
-        console.error("Errore caricamento contatti:", error);
-      } else if (contatti) {
+      if (!error && contatti) {
         setContatti(contatti);
       }
 
@@ -57,59 +53,113 @@ export default function AdminContatti() {
 
   return (
     <main style={styles.page}>
-      <h1>Messaggi di contattofdfdf</h1>
+      <div style={styles.card}>
+        <h1 style={styles.title}>📩 Messaggi di contatto</h1>
 
-      {contatti.length === 0 ? (
-        <p>Nessun messaggio ricevuto</p>
-      ) : (
-        <div style={styles.tableWrapper}>
-          <table style={styles.table}>
-            <thead>
-              <tr>
-                <th>Data</th>
-                <th>Nome</th>
-                <th>Cognome</th>
-                <th>Email</th>
-                <th>Messaggio</th>
-              </tr>
-            </thead>
-            <tbody>
-              {contatti.map((c) => (
-                <tr key={c.id}>
-                  <td>
-                    {new Date(c.created_at).toLocaleDateString("it-IT")}
-                  </td>
-                  <td>
-                    {c.nome} 
-                  </td>
-                  <td>{c.cognome}</td>
-                  <td>{c.email}</td>
-                  <td>{c.messaggio}</td>
+        {contatti.length === 0 ? (
+          <p style={styles.empty}>Nessun messaggio ricevuto</p>
+        ) : (
+          <div style={styles.tableWrapper}>
+            <table style={styles.table}>
+              <thead>
+                <tr>
+                  <th style={styles.th}>Data</th>
+                  <th style={styles.th}>Nome</th>
+                  <th style={styles.th}>Cognome</th>
+                  <th style={styles.th}>Email</th>
+                  <th style={styles.th}>Messaggio</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+              </thead>
+              <tbody>
+                {contatti.map((c, index) => (
+                  <tr
+                    key={c.id}
+                    style={{
+                      backgroundColor:
+                        index % 2 === 0 ? "#ffffff" : "#f9fafb",
+                    }}
+                  >
+                    <td style={styles.td}>
+                      {new Date(c.created_at).toLocaleDateString("it-IT")}
+                    </td>
+                    <td style={styles.td}>{c.nome}</td>
+                    <td style={styles.td}>{c.cognome}</td>
+                    <td style={styles.tdEmail}>{c.email}</td>
+                    <td style={styles.tdMessage}>{c.messaggio}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
     </main>
   );
 }
+
+/* ================= STILI ================= */
 
 const styles: Record<string, React.CSSProperties> = {
   page: {
     minHeight: "100vh",
     padding: 40,
-    background: "#f4f4f4",
-    fontFamily: "sans-serif",
+    background: "#f3f4f6",
+    fontFamily: "system-ui, sans-serif",
+  },
+  card: {
+    maxWidth: 1200,
+    margin: "0 auto",
+    background: "#ffffff",
+    borderRadius: 12,
+    padding: 24,
+    boxShadow: "0 10px 30px rgba(0,0,0,0.08)",
+  },
+  title: {
+    fontSize: 26,
+    fontWeight: 800,
+    marginBottom: 20,
+    color: "#111827",
+  },
+  empty: {
+    padding: 20,
+    color: "#6b7280",
   },
   tableWrapper: {
-    marginTop: 30,
     overflowX: "auto",
   },
   table: {
     width: "100%",
     borderCollapse: "collapse",
-    background: "#fff",
-    color: "#000",
+    fontSize: 14,
+  },
+  th: {
+    textAlign: "left",
+    padding: "12px 10px",
+    borderBottom: "2px solid #e5e7eb",
+    backgroundColor: "#f9fafb",
+    fontWeight: 700,
+    color: "#374151",
+    position: "sticky",
+    top: 0,
+    zIndex: 1,
+  },
+  td: {
+    padding: "10px",
+    verticalAlign: "top",
+    borderBottom: "1px solid #e5e7eb",
+    color: "#111827",
+  },
+  tdEmail: {
+    padding: "10px",
+    borderBottom: "1px solid #e5e7eb",
+    color: "#2563eb",
+    whiteSpace: "nowrap",
+  },
+  tdMessage: {
+    padding: "10px",
+    borderBottom: "1px solid #e5e7eb",
+    whiteSpace: "pre-wrap",
+    maxWidth: 500,
+    color: "#111827",
   },
 };

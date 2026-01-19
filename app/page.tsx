@@ -171,6 +171,7 @@ export default function Home() {
             <input
               placeholder="Nome"
               value={form.nome}
+              maxLength={100}
               onChange={(e) =>
                 setForm({ ...form, nome: e.target.value })
               }
@@ -181,6 +182,7 @@ export default function Home() {
             <input
               placeholder="Cognome"
               value={form.cognome}
+              maxLength={100}
               onChange={(e) =>
                 setForm({ ...form, cognome: e.target.value })
               }
@@ -192,6 +194,7 @@ export default function Home() {
               type="email"
               placeholder="Email"
               value={form.email}
+              maxLength={255}
               onChange={(e) =>
                 setForm({ ...form, email: e.target.value })
               }
@@ -202,6 +205,7 @@ export default function Home() {
             <textarea
               placeholder="Messaggio"
               value={form.messaggio}
+              maxLength={1000}
               onChange={(e) =>
                 setForm({ ...form, messaggio: e.target.value })
               }
@@ -209,6 +213,9 @@ export default function Home() {
               rows={4}
               style={inputStyle}
             />
+            <p style={{ fontSize: 12, color: "#666", textAlign: "right" }}>
+                  {form.messaggio.length} / 1000
+            </p>
 
             <button type="submit" disabled={loading} style={styles.submit}>
               {loading ? "Invio..." : "Invia"}
