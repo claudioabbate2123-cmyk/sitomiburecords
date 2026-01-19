@@ -62,6 +62,10 @@ export default function AdminDashboard() {
           <h2>📊 Bilancio mensile</h2>
           <p>Consulta gli incassi della sala prove</p>
         </Link>
+        <Link href="/admin/cose_da_fare_mibu" style={styles.card}>
+          <h2>📝 Cose da fare</h2>
+          <p>Gestione attività e pianificazione</p>
+        </Link>
       </div>
 
       {/* ===== AZIONI ADMIN ===== */}
@@ -97,19 +101,21 @@ const styles: Record<string, React.CSSProperties> = {
     fontFamily: "sans-serif",
   },
   grid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+    display: "flex",
+    flexWrap: "wrap",
     gap: 20,
     marginTop: 40,
   },
-  card: {
-    background: "#fff",
-    padding: 24,
-    borderRadius: 8,
-    textDecoration: "none",
-    color: "#000",
-    boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-  },
+card: {
+  width: 280,
+  background: "#fff",
+  padding: 24,
+  borderRadius: 8,
+  textDecoration: "none",
+  color: "#000",
+  boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+},
+
 
   /* ===== NUOVA SEZIONE AZIONI ===== */
   actions: {

@@ -46,6 +46,7 @@ export default function CalendarioPersonaleEditPage() {
   const [categorie, setCategorie] = useState<Categoria[]>([]);
   const [loading, setLoading] = useState(false);
   const [categoriaFiltro, setCategoriaFiltro] = useState<string>("tutte");
+  const [statoFiltro, setStatoFiltro] = useState<"tutte" | "fatte" | "non_fatte">("tutte");
 
 
   const [nuovoEvento, setNuovoEvento] = useState({
@@ -87,16 +88,27 @@ export default function CalendarioPersonaleEditPage() {
   /* ================= LOAD COSE DA FARE ================= */
 
   const fetchCoseDaFare = async () => {
-    if (!dataSelezionata) return;
+      if (!dataSelezionata) return;
 
-    const { data } = await supabase
-      .from("cose_da_fare")
-      .select("id, elemento, fatto, categoria")
-      .eq("data", dataSelezionata)
-      .order("created_at");
+      let query = supabase
+        .from("cose_da_fare")
+        .select("id, elemento, fatto, categoria")
+        .eq("data", dataSelezionata)
+        .order("created_at");
 
-    setCoseDaFare(data || []);
-  };
+      if (statoFiltro === "fatte") {
+        query = query.eq("fatto", true);
+      }
+
+      if (statoFiltro === "non_fatte") {
+        query = query.eq("fatto", false);
+      }
+
+      const { data } = await query;
+
+      setCoseDaFare(data || []);
+    };
+
 
   /* ================= LOAD CATEGORIE ================= */
 
@@ -113,10 +125,10 @@ export default function CalendarioPersonaleEditPage() {
 }, [dataSelezionata]);
 
   useEffect(() => {
-    
-    fetchCoseDaFare();
-    fetchCategorie();
-  }, [dataSelezionata]);
+  fetchCoseDaFare();
+  fetchCategorie();
+}, [dataSelezionata, statoFiltro]);
+
 
   /* ================= UPDATE ================= */
 
@@ -350,34 +362,55 @@ const salvaTutteLeModifiche = async () => {
   /* ================= RIMANDA A DOMANI ================= */
 
   const rimandaADomani = async () => {
-    if (!dataSelezionata) return;
+      if (!dataSelezionata) return;
 
-    const domani = new Date(dataSelezionata);
-    domani.setDate(domani.getDate() + 1);
+      const domani = new Date(dataSelezionata);
+      domani.setDate(domani.getDate() + 1);
 
-    const dataDomani = domani.toISOString().slice(0, 10);
+      const dataDomani = domani.toISOString().slice(0, 10);
 
-    const daRimandare = coseDaFare.filter((c) => !c.fatto);
+      const daRimandare = coseDaFare.filter((c) => !c.fatto);
 
-    if (daRimandare.length === 0) {
-      alert("Nessuna cosa da fare da rimandare");
-      return;
-    }
+      if (daRimandare.length === 0) {
+        alert("Nessuna cosa da fare da rimandare");
+        return;
+      }
 
-    setLoading(true);
+      if (
+        !confirm(
+          `Rimandare ${daRimandare.length} cose non fatte a domani e rimuoverle da oggi?`
+        )
+      ) {
+        return;
+      }
 
-    const payload = daRimandare.map((c) => ({
-      elemento: c.elemento,
-      fatto: false,
-      data: dataDomani,
-      categoria: c.categoria || null,
-    }));
+      setLoading(true);
 
-    await supabase.from("cose_da_fare").insert(payload);
+  /* 1️⃣ INSERISCI A DOMANI */
+  const payload = daRimandare.map((c) => ({
+    elemento: c.elemento,
+    fatto: false,
+    data: dataDomani,
+    categoria: c.categoria || null,
+  }));
 
-    setLoading(false);
-    alert("Cose da fare rimandate a domani");
-  };
+  await supabase.from("cose_da_fare").insert(payload);
+
+  /* 2️⃣ ELIMINA DA OGGI */
+  const idsDaEliminare = daRimandare.map((c) => c.id);
+
+  await supabase
+    .from("cose_da_fare")
+    .delete()
+    .in("id", idsDaEliminare);
+
+  /* 3️⃣ RICARICA LISTA */
+  await fetchCoseDaFare();
+
+  setLoading(false);
+  alert("Cose da fare rimandate a domani");
+};
+
 
   /* ================= GUARD ================= */
 
@@ -506,18 +539,35 @@ const salvaTutteLeModifiche = async () => {
 
       <div style={styles.newBookingRow}>
         <div style={styles.field}>
-          <label style={styles.label}>Descrizione</label>
-          <input
-            style={styles.input}
-            value={nuovaCosaDaFare.elemento}
-            onChange={(e) =>
-              setNuovaCosaDaFare({
-                ...nuovaCosaDaFare,
-                elemento: e.target.value,
-              })
-            }
-          />
-        </div>
+            <label style={styles.label}>Descrizione</label>
+
+            <textarea
+              ref={(el) => {
+                if (el) {
+                  el.style.height = "auto";
+                  el.style.height = el.scrollHeight + "px";
+                }
+              }}
+              style={{
+                ...styles.input,
+                resize: "none",
+                overflow: "hidden",
+              }}
+              value={nuovaCosaDaFare.elemento}
+              onInput={(e) => {
+                const target = e.target as HTMLTextAreaElement;
+                target.style.height = "auto";
+                target.style.height = target.scrollHeight + "px";
+              }}
+              onChange={(e) =>
+                setNuovaCosaDaFare({
+                  ...nuovaCosaDaFare,
+                  elemento: e.target.value,
+                })
+              }
+            />
+          </div>
+
 
         <div style={styles.field}>
           <label style={styles.label}>Categoria</label>
@@ -543,25 +593,74 @@ const salvaTutteLeModifiche = async () => {
       <button onClick={salvaCosaDaFare} style={styles.saveButton}>
         💾 Salva cosa da fare
       </button>
-      <div style={{ marginBottom: 16, maxWidth: 300 }}>
-          <label style={{ ...styles.label, marginBottom: 6 }}>
-            Scegli categoria cose da fare
-          </label>
+      <div
+          style={{
+            marginBottom: 16,
+            display: "flex",
+            gap: 16,
+            flexWrap: "wrap",
+            alignItems: "flex-end",
+          }}
+        >
+          {/* FILTRO CATEGORIA */}
+          <div style={{ maxWidth: 260 }}>
+            <label style={{ ...styles.label, marginBottom: 6 }}>
+              Categoria
+            </label>
 
-          <select
-            value={categoriaFiltro}
-            onChange={(e) => setCategoriaFiltro(e.target.value)}
-            style={styles.input}
-          >
-            <option value="tutte">Tutte le categorie</option>
+            <select
+              value={categoriaFiltro}
+              onChange={(e) => setCategoriaFiltro(e.target.value)}
+              style={styles.input}
+            >
+              <option value="tutte">Tutte le categorie</option>
 
-            {categorie.map((c) => (
-              <option key={c.id} value={c.nome}>
-                {c.nome}
-              </option>
-            ))}
-          </select>
+              {categorie.map((c) => (
+                <option key={c.id} value={c.nome}>
+                  {c.nome}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* FILTRO STATO */}
+          <div style={{ maxWidth: 200 }}>
+            <label style={{ ...styles.label, marginBottom: 6 }}>
+              Stato
+            </label>
+
+            <select
+              value={statoFiltro}
+              onChange={(e) =>
+                setStatoFiltro(e.target.value as "tutte" | "fatte" | "non_fatte")
+              }
+              style={styles.input}
+            >
+              <option value="tutte">Tutte</option>
+              <option value="fatte">Fatte</option>
+              <option value="non_fatte">Non fatte</option>
+            </select>
+          </div>
+          {/* GESTIONE CATEGORIE */}
+          <div>
+            <button
+              type="button"
+              onClick={() => router.push("/admin/categorie_cose_da_fare")}
+              style={{
+                ...styles.saveButton,
+                backgroundColor: "#0ea5e9",
+                marginBottom: 0,
+                height: 38,
+                display: "flex",
+                alignItems: "center",
+              }}
+            >
+              ⚙️ Gestisci categorie
+            </button>
+          </div>
+
         </div>
+
 
 
       <table style={styles.table}>
@@ -575,12 +674,14 @@ const salvaTutteLeModifiche = async () => {
         </thead>
         <tbody>
          {coseDaFare
-            .filter((c) =>
-              categoriaFiltro === "tutte"
-                ? true
-                : c.categoria === categoriaFiltro
-            )
-            .map((c) => (
+          .filter((c) =>
+            categoriaFiltro === "tutte"
+              ? true
+              : c.categoria === categoriaFiltro
+          )
+          
+          .map((c) => (
+
 
             <tr key={c.id}>
               <td style={styles.td}>
