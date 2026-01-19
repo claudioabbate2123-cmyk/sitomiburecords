@@ -1,115 +1,88 @@
 "use client";
 
-import Link from "next/link";
-
-export default function CorsiPage() {
+export default function BandPage() {
   return (
     <main style={styles.page}>
-      {/* HERO */}
+      {/* HERO PAGINA */}
       <section style={styles.hero}>
-        <h1 style={styles.title}>Corsi</h1>
+        <h1 style={styles.title}>Le nostre band</h1>
         <p style={styles.intro}>
-          Percorsi formativi dedicati alla musica afro-cubana, latina
-          e alla produzione musicale, guidati da musicisti e docenti attivi
-          sulla scena contemporanea.
+          MIBU è casa di progetti musicali diversi, uniti dalla ricerca, dalla
+          tradizione e dalla contaminazione tra linguaggi musicali.
         </p>
       </section>
 
-      {/* GRIGLIA CORSI */}
+      {/* BAND PRINCIPALE */}
+      <section style={styles.featured}>
+        <div style={styles.featuredContent}>
+          <h2 style={styles.featuredTitle}>La Canchanchara</h2>
+          <span style={styles.genre}>Timba cubana contemporanea</span>
+          <p style={styles.text}>
+            La Canchanchara nasce come progetto di musica originale di timba
+            cubana, dove ritmo, parola e movimento si intrecciano in un racconto
+            sonoro contemporaneo. Una musica viva, profondamente radicata nella
+            cultura cubana ma aperta alla sperimentazione e al dialogo con altri
+            linguaggi.
+          </p>
+        </div>
+      </section>
+
+      {/* ALTRE BAND */}
       <section style={styles.section}>
+        <h2 style={styles.sectionTitle}>Altri progetti musicali</h2>
+
         <div style={styles.grid}>
-          <CorsoLink href="/didattica/corsi/pianoforte-latino">
-            <CorsoCard
-              titolo="Pianoforte latino"
-              docente="Claudio Abbate"
-              immagine="/pianofortelatino.JPG"
-            />
-          </CorsoLink>
+          <BandCard
+            nome="Blue en Santiago"
+            genere="Son cubano"
+            descrizione="Un omaggio alle radici del son tradizionale cubano, tra ritmo, danza e poesia."
+          />
 
-          <CorsoLink href="/didattica/corsi/congas">
-            <CorsoCard
-              titolo="Congas"
-              docente="Fabrizio Pironi"
-              immagine="/congas.JPG"
-            />
-          </CorsoLink>
+          <BandCard
+            nome="Manente"
+            genere="Musica popolare calabrese"
+            descrizione="Un progetto che esplora la tradizione musicale calabrese con uno sguardo contemporaneo."
+          />
 
-          <CorsoLink href="/didattica/corsi/cubase">
-            <CorsoCard
-              titolo="Cubase – Produzione musicale"
-              docente="Claudio Abbate"
-              immagine="/cubaseproduzione.JPG"
-            />
-          </CorsoLink>
+          <BandCard
+            nome="Mangoson"
+            genere="musica popolare cubana/latin jazz"
+            descrizione="La versione ristretta de La Canchanchara orientata a un repertorio misto di musica cubana"
+          />
 
-          <CorsoLink href="/didattica/corsi/basso-latino">
-            <CorsoCard
-              titolo="Basso latino"
-              docente="Michele Ferretti"
-              immagine="/bassolatino.JPG"
-            />
-          </CorsoLink>
+          <BandCard
+            nome="Roman Villanueva’s Latin Jazz Sextet"
+            genere="Latin jazz"
+            descrizione="Jazz e ritmi afro-caraibici si incontrano in un progetto energico e raffinato."
+          />
 
-          <CorsoLink href="/didattica/corsi/batteria-timba">
-            <CorsoCard
-              titolo="Batteria nella timba cubana"
-              docente="Manuel Flores"
-              immagine="/batteriatimba.JPG"
-            />
-          </CorsoLink>
-
-          <CorsoLink href="/didattica/corsi/dj">
-            <CorsoCard
-              titolo="Corso di DJ"
-              docente="Fabrizio Pironi"
-              immagine="/djcourse.JPG"
-            />
-          </CorsoLink>
+          <BandCard
+            nome="Acdm4"
+            genere="Jazz"
+            descrizione="Un quartetto jazz che spazia tra composizioni originali e riletture moderne."
+          />
         </div>
       </section>
     </main>
   );
 }
 
-/* ================= LINK WRAPPER ================= */
+/* ================= COMPONENTE CARD ================= */
 
-function CorsoLink({
-  href,
-  children,
+function BandCard({
+  nome,
+  genere,
+  descrizione,
 }: {
-  href: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <Link href={href} style={{ textDecoration: "none" }}>
-      {children}
-    </Link>
-  );
-}
-
-/* ================= CARD ================= */
-
-function CorsoCard({
-  titolo,
-  docente,
-  immagine,
-}: {
-  titolo: string;
-  docente: string;
-  immagine: string;
+  nome: string;
+  genere: string;
+  descrizione: string;
 }) {
   return (
     <div style={styles.card}>
-      <img
-        src={immagine}
-        alt={titolo}
-        style={styles.cardImage}
-      />
-
-      <div style={styles.cardContent}>
-        <h3 style={styles.cardTitle}>{titolo}</h3>
-        <span style={styles.cardDocente}>{docente}</span>
-      </div>
+      <h3 style={styles.cardTitle}>{nome}</h3>
+      <span style={styles.cardGenre}>{genere}</span>
+      <p style={styles.cardText}>{descrizione}</p>
     </div>
   );
 }
@@ -143,35 +116,68 @@ const styles: Record<string, React.CSSProperties> = {
     lineHeight: 1.6,
   },
 
+  /* BAND PRINCIPALE */
+  featured: {
+    background: "#fff",
+    padding: "48px",
+    borderRadius: 12,
+    maxWidth: 1000,
+    margin: "0 auto 80px",
+    boxShadow: "0 8px 24px rgba(0,0,0,0.08)",
+  },
+
+  featuredContent: {
+    maxWidth: 700,
+  },
+
+  featuredTitle: {
+    fontSize: 32,
+    fontWeight: 700,
+    marginBottom: 8,
+    color: "#000",
+  },
+
+  genre: {
+    display: "inline-block",
+    marginBottom: 16,
+    fontSize: 14,
+    fontWeight: 600,
+    letterSpacing: 1,
+    color: "#666",
+    textTransform: "uppercase",
+  },
+
+  text: {
+    fontSize: 16,
+    lineHeight: 1.7,
+    color: "#333",
+  },
+
+  /* ALTRE BAND */
   section: {
     maxWidth: 1100,
     margin: "0 auto",
   },
 
+  sectionTitle: {
+    fontSize: 28,
+    fontWeight: 700,
+    marginBottom: 32,
+    textAlign: "center",
+    color: "#000",
+  },
+
   grid: {
     display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-    gap: 32,
+    gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+    gap: 24,
   },
 
   card: {
     background: "#fff",
-    borderRadius: 12,
-    overflow: "hidden",
-    boxShadow: "0 6px 20px rgba(0,0,0,0.08)",
-    cursor: "pointer",
-    transition: "transform 0.2s ease, box-shadow 0.2s ease",
-  },
-
-  cardImage: {
-    width: "100%",
-    height: 180,
-    objectFit: "cover",
-    display: "block",
-  },
-
-  cardContent: {
     padding: 24,
+    borderRadius: 8,
+    boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
   },
 
   cardTitle: {
@@ -181,9 +187,17 @@ const styles: Record<string, React.CSSProperties> = {
     color: "#000",
   },
 
-  cardDocente: {
-    fontSize: 14,
+  cardGenre: {
+    fontSize: 13,
     fontWeight: 600,
-    color: "#666",
+    textTransform: "uppercase",
+    color: "#777",
+  },
+
+  cardText: {
+    marginTop: 12,
+    fontSize: 14,
+    lineHeight: 1.6,
+    color: "#444",
   },
 };
