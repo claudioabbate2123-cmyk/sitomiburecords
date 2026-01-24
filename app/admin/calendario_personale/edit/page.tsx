@@ -410,6 +410,493 @@ const salvaTutteLeModifiche = async () => {
   setLoading(false);
   alert("Cose da fare rimandate a domani");
 };
+/* ================= COSE DA CONCERTO ================= */
+
+const salvaCoseDaConcerto = async () => {
+  if (!dataSelezionata) return;
+
+  setLoading(true);
+
+  const lista = [
+    "tastiera grande",
+    "tastiera piccola",
+    "cavo di collegamento tra tastiere",
+    "pedale tastiera piccola",
+    "pedale tastiera grande",
+    "caricatore tastiera grande",
+    "caricatore tastiera piccola",
+    "tablet",
+    "caricatore tablet",
+    "caricatore telefono",
+    "Penna tablet",
+    "leggio",
+    "reggitastiera singolo",
+    "reggitastiera doppio",
+    "cavo jack per tastiera/mixer",
+  ];
+
+  // assicura categoria Concerto
+  const { data: cat } = await supabase
+    .from("categorie_cose_da_fare")
+    .select("id")
+    .eq("nome", "Concerto")
+    .maybeSingle();
+
+  if (!cat) {
+    await supabase.from("categorie_cose_da_fare").insert({
+      nome: "Concerto",
+    });
+  }
+
+  // evita duplicati per lo stesso giorno
+  const { data: esistenti } = await supabase
+    .from("cose_da_fare")
+    .select("elemento")
+    .eq("data", dataSelezionata)
+    .eq("categoria", "Concerto");
+
+  const presenti = new Set(esistenti?.map((e) => e.elemento));
+
+  const daInserire = lista
+    .filter((e) => !presenti.has(e))
+    .map((e) => ({
+      elemento: e,
+      fatto: false,
+      data: dataSelezionata,
+      categoria: "Concerto",
+    }));
+
+  if (daInserire.length > 0) {
+    await supabase.from("cose_da_fare").insert(daInserire);
+  }
+
+  await fetchCoseDaFare();
+  await fetchCategorie();
+  setLoading(false);
+};
+/* ================= ATTIVITA' DI CASA ================= */
+
+const salvaAttivitaDiCasa = async () => {
+  if (!dataSelezionata) return;
+
+  setLoading(true);
+
+  const lista = [
+    "lavare piatti",
+    "mettere a posto la spesa",
+    "spazzare per terra cucina",
+    "pulire bagno",
+    "pulire superfici cucinina",
+    "lavare scola piatti",
+    "pulire piatto doccia",
+    "rifare il letto",
+    "spazzare stanza da letto",
+    "lavare pavimento",
+    "cucinare cena",
+    "cucinare pranzo",
+    "aspirare insettini tutte le stanze",
+    "sparecchiare",
+    "mettere a posto in cucina",
+    "buttare mondezza",
+  ];
+
+  // assicura categoria Attività di casa
+  const { data: cat } = await supabase
+    .from("categorie_cose_da_fare")
+    .select("id")
+    .eq("nome", "attività di casa")
+    .maybeSingle();
+
+  if (!cat) {
+    await supabase.from("categorie_cose_da_fare").insert({
+      nome: "attivita di casa",
+    });
+  }
+
+  // evita duplicati per lo stesso giorno
+  const { data: esistenti } = await supabase
+    .from("cose_da_fare")
+    .select("elemento")
+    .eq("data", dataSelezionata)
+    .eq("categoria", "attivita di casa");
+
+  const presenti = new Set(esistenti?.map((e) => e.elemento));
+
+  const daInserire = lista
+    .filter((e) => !presenti.has(e))
+    .map((e) => ({
+      elemento: e,
+      fatto: false,
+      data: dataSelezionata,
+      categoria: "attivita di casa",
+    }));
+
+  if (daInserire.length > 0) {
+    await supabase.from("cose_da_fare").insert(daInserire);
+  }
+
+  await fetchCoseDaFare();
+  await fetchCategorie();
+  setLoading(false);
+};
+
+/* ================= Pianoforte/Jazz ================= */
+
+const salvaPianoforteJazz = async () => {
+  if (!dataSelezionata) return;
+
+  setLoading(true);
+
+  const lista = [
+    "Impro standard accordi e melodia",
+    "Impro standard wolking e melodia",
+    "Impro standard piano solo",
+    "Impro standard stride piano",
+    "accompagnamento standard drop2",
+    "accompagnamento walking accordi standard",
+    "tema Donna lee",
+    "tema Spain",
+    "tema Billie's Bounce",
+    "tema Blue Bossa",
+    "tema Solar",
+    "tema Recordame",
+    "tema Black Orpheus",
+  ];
+
+  // assicura categoria Pianoforte/Jazz
+  const { data: cat } = await supabase
+    .from("categorie_cose_da_fare")
+    .select("id")
+    .eq("nome", "pianoforte/jazz")
+    .maybeSingle();
+
+  if (!cat) {
+    await supabase.from("categorie_cose_da_fare").insert({
+      nome: "pianoforte/jazz",
+    });
+  }
+
+  // evita duplicati per lo stesso giorno
+  const { data: esistenti } = await supabase
+    .from("cose_da_fare")
+    .select("elemento")
+    .eq("data", dataSelezionata)
+    .eq("categoria", "pianoforte/jazz");
+
+  const presenti = new Set(esistenti?.map((e) => e.elemento));
+
+  const daInserire = lista
+    .filter((e) => !presenti.has(e))
+    .map((e) => ({
+      elemento: e,
+      fatto: false,
+      data: dataSelezionata,
+      categoria: "pianoforte/jazz",
+    }));
+
+  if (daInserire.length > 0) {
+    await supabase.from("cose_da_fare").insert(daInserire);
+  }
+
+  await fetchCoseDaFare();
+  await fetchCategorie();
+  setLoading(false);
+};
+
+
+/* ================= Pianoforte/Jazz/Maggiori ================= */
+
+const salvaPianoforteJazzMaggiore = async () => {
+  if (!dataSelezionata) return;
+
+  setLoading(true);
+
+  const lista = [
+    "frasi II V I maggiori",
+    "accompagnamento drop 2 II V I maggiori",
+    "accompagnamento drop 2 con rivolti II V I maggiori",
+    "accompagnamento walking sinistra accordi destra II V I maggiori A B",
+    "II V I maggiori mano sinistra A B",
+    "accompagnamento piano solo II V I maggiori A B",
+  ];
+
+  // assicura categoria Attività di casa
+  const { data: cat } = await supabase
+    .from("categorie_cose_da_fare")
+    .select("id")
+    .eq("nome", "pianoforte/jazz/maggiori")
+    .maybeSingle();
+
+  if (!cat) {
+    await supabase.from("categorie_cose_da_fare").insert({
+      nome: "pianoforte/jazz/maggiori",
+    });
+  }
+
+  // evita duplicati per lo stesso giorno
+  const { data: esistenti } = await supabase
+    .from("cose_da_fare")
+    .select("elemento")
+    .eq("data", dataSelezionata)
+    .eq("categoria", "pianoforte/jazz/maggiori");
+
+  const presenti = new Set(esistenti?.map((e) => e.elemento));
+
+  const daInserire = lista
+    .filter((e) => !presenti.has(e))
+    .map((e) => ({
+      elemento: e,
+      fatto: false,
+      data: dataSelezionata,
+      categoria: "pianoforte/jazz/maggiori",
+    }));
+
+  if (daInserire.length > 0) {
+    await supabase.from("cose_da_fare").insert(daInserire);
+  }
+
+  await fetchCoseDaFare();
+  await fetchCategorie();
+  setLoading(false);
+};
+/* ================= Pianoforte/Jazz/minori ================= */
+
+const salvaPianoforteJazzMinore = async () => {
+  if (!dataSelezionata) return;
+
+  setLoading(true);
+
+  const lista = [
+    "frasi II V I minori",
+    "accompagnamento drop 2 II V I minori",
+    "accompagnamento drop 2 con rivolti II V I minori",
+    "accompagnamento walking sinistra accordi destra II V I minori A B",
+    "II V I minori mano sinistra A B",
+    "accompagnamento piano solo II V I minori A B",
+  ];
+
+  // assicura categoria Attività di casa
+  const { data: cat } = await supabase
+    .from("categorie_cose_da_fare")
+    .select("id")
+    .eq("nome", "pianoforte/jazz/minori")
+    .maybeSingle();
+
+  if (!cat) {
+    await supabase.from("categorie_cose_da_fare").insert({
+      nome: "pianoforte/jazz/minori",
+    });
+  }
+
+  // evita duplicati per lo stesso giorno
+  const { data: esistenti } = await supabase
+    .from("cose_da_fare")
+    .select("elemento")
+    .eq("data", dataSelezionata)
+    .eq("categoria", "pianoforte/jazz/minori");
+
+  const presenti = new Set(esistenti?.map((e) => e.elemento));
+
+  const daInserire = lista
+    .filter((e) => !presenti.has(e))
+    .map((e) => ({
+      elemento: e,
+      fatto: false,
+      data: dataSelezionata,
+      categoria: "pianoforte/jazz/minori",
+    }));
+
+  if (daInserire.length > 0) {
+    await supabase.from("cose_da_fare").insert(daInserire);
+  }
+
+  await fetchCoseDaFare();
+  await fetchCategorie();
+  setLoading(false);
+};
+
+
+/* ================= Sport ================= */
+
+const salvaSport = async () => {
+  if (!dataSelezionata) return;
+
+  setLoading(true);
+
+  const lista = [
+    "correre almeno 1 h",
+    "almeno 21 flessioni",
+    "almeno 25 addominali",
+  ];
+
+  // assicura categoria Attività di casa
+  const { data: cat } = await supabase
+    .from("categorie_cose_da_fare")
+    .select("id")
+    .eq("nome", "sport")
+    .maybeSingle();
+
+  if (!cat) {
+    await supabase.from("categorie_cose_da_fare").insert({
+      nome: "sport",
+    });
+  }
+
+  // evita duplicati per lo stesso giorno
+  const { data: esistenti } = await supabase
+    .from("cose_da_fare")
+    .select("elemento")
+    .eq("data", dataSelezionata)
+    .eq("categoria", "sport");
+
+  const presenti = new Set(esistenti?.map((e) => e.elemento));
+
+  const daInserire = lista
+    .filter((e) => !presenti.has(e))
+    .map((e) => ({
+      elemento: e,
+      fatto: false,
+      data: dataSelezionata,
+      categoria: "sport",
+    }));
+
+  if (daInserire.length > 0) {
+    await supabase.from("cose_da_fare").insert(daInserire);
+  }
+
+  await fetchCoseDaFare();
+  await fetchCategorie();
+  setLoading(false);
+};
+
+/* ================= AGGIUNGI COSE "SITO MIBU" A OGGI (NO FUTURO) ================= */
+
+const aggiungiSitoMibuAOggi = async () => {
+  if (!dataSelezionata) return;
+
+  setLoading(true);
+
+  // 1️⃣ cose NON fatte di Sito Mibu SOLO nei giorni PRECEDENTI a oggi
+  const { data: sitoMibu } = await supabase
+    .from("cose_da_fare")
+    .select("elemento")
+    .eq("categoria", "Sito Mibu")
+    .eq("fatto", false)
+    .lt("data", dataSelezionata); // ⛔️ esclude oggi e giorni futuri
+
+  if (!sitoMibu || sitoMibu.length === 0) {
+    setLoading(false);
+    return;
+  }
+
+  // 2️⃣ cose già presenti oggi
+  const { data: oggi } = await supabase
+    .from("cose_da_fare")
+    .select("elemento")
+    .eq("data", dataSelezionata)
+    .eq("categoria", "Sito Mibu");
+
+  const presentiOggi = new Set(oggi?.map((c) => c.elemento));
+
+  // 3️⃣ deduplica globale per nome
+  const uniche = Array.from(
+    new Set(sitoMibu.map((c) => c.elemento))
+  );
+
+  // 4️⃣ prepara inserimento evitando duplicati oggi
+  const daInserire = uniche
+    .filter((el) => !presentiOggi.has(el))
+    .map((el) => ({
+      elemento: el,
+      fatto: false,
+      data: dataSelezionata,
+      categoria: "Sito Mibu",
+    }));
+
+  if (daInserire.length > 0) {
+    await supabase.from("cose_da_fare").insert(daInserire);
+  }
+
+  await fetchCoseDaFare();
+  setLoading(false);
+};
+/* ================= AGGIUNGI COSE "SITO MIBU Area personale" A OGGI (NO FUTURO) ================= */
+
+const aggiungiSitoMibuAreaPersonaleAOggi = async () => {
+  if (!dataSelezionata) return;
+
+  setLoading(true);
+
+  // 1️⃣ cose NON fatte di Sito Mibu SOLO nei giorni PRECEDENTI a oggi
+  const { data: sitoMibu } = await supabase
+    .from("cose_da_fare")
+    .select("elemento")
+    .eq("categoria", "Sito Mibu Area personale")
+    .eq("fatto", false)
+    .lt("data", dataSelezionata); // ⛔️ esclude oggi e giorni futuri
+
+  if (!sitoMibu || sitoMibu.length === 0) {
+    setLoading(false);
+    return;
+  }
+
+  // 2️⃣ cose già presenti oggi
+  const { data: oggi } = await supabase
+    .from("cose_da_fare")
+    .select("elemento")
+    .eq("data", dataSelezionata)
+    .eq("categoria", "Sito Mibu Area personale");
+
+  const presentiOggi = new Set(oggi?.map((c) => c.elemento));
+
+  // 3️⃣ deduplica globale per nome
+  const uniche = Array.from(
+    new Set(sitoMibu.map((c) => c.elemento))
+  );
+
+  // 4️⃣ prepara inserimento evitando duplicati oggi
+  const daInserire = uniche
+    .filter((el) => !presentiOggi.has(el))
+    .map((el) => ({
+      elemento: el,
+      fatto: false,
+      data: dataSelezionata,
+      categoria: "Sito Mibu Area personale",
+    }));
+
+  if (daInserire.length > 0) {
+    await supabase.from("cose_da_fare").insert(daInserire);
+  }
+
+  await fetchCoseDaFare();
+  setLoading(false);
+};
+
+
+/* ================= ELIMINA TUTTE LE COSE DA FARE DEL GIORNO ================= */
+
+const eliminaTutteLeCoseDaFare = async () => {
+  if (!dataSelezionata) return;
+
+  if (
+    !confirm(
+      "Eliminare TUTTE le cose da fare per questo giorno? L'operazione è irreversibile."
+    )
+  ) {
+    return;
+  }
+
+  setLoading(true);
+
+  await supabase
+    .from("cose_da_fare")
+    .delete()
+    .eq("data", dataSelezionata);
+
+  await fetchCoseDaFare();
+  setLoading(false);
+};
+
 
 
   /* ================= GUARD ================= */
@@ -534,6 +1021,103 @@ const salvaTutteLeModifiche = async () => {
 
 
       {/* COSE DA FARE */}
+
+      <button
+        onClick={salvaCoseDaConcerto}
+        style={{
+          ...styles.saveButton,
+          backgroundColor: "#0f766e",
+          marginBottom: 16,
+          marginRight: 12,
+        }}
+      >
+        🎤 Cose da concerto
+      </button>
+
+        <button
+          onClick={salvaAttivitaDiCasa}
+          style={{
+            ...styles.saveButton,
+            backgroundColor: "#0f766e",
+            marginBottom: 16,
+            marginRight: 12,
+          }}
+        >
+          🏠 Attività di casa
+        </button>
+        <button
+          onClick={aggiungiSitoMibuAOggi}
+          style={{
+            ...styles.saveButton,
+            backgroundColor: "#0f766e",
+            marginBottom: 16,
+            marginRight: 12,
+          }}
+        >
+          🌐 Sito Mibu non fatte
+
+        </button>
+         <button
+          onClick={aggiungiSitoMibuAreaPersonaleAOggi}
+          style={{
+            ...styles.saveButton,
+            backgroundColor: "#0f766e",
+            marginBottom: 16,
+            marginRight: 12,
+          }}
+        >
+          🌐 Sito Mibu Area Personale non fatte
+
+        </button>
+        <button
+          onClick={salvaSport}
+          style={{
+            ...styles.saveButton,
+            backgroundColor: "#0f766e",
+            marginBottom: 16,
+            marginRight: 12,
+          }}
+        >
+          💪 Sport
+
+        </button>
+        <button
+          onClick={salvaPianoforteJazz}
+          style={{
+            ...styles.saveButton,
+            backgroundColor: "#0f766e",
+            marginBottom: 16,
+            marginRight: 12,
+          }}
+        >
+          🎹 Pianoforte/jazz
+
+        </button>
+        <button
+          onClick={salvaPianoforteJazzMaggiore}
+          style={{
+            ...styles.saveButton,
+            backgroundColor: "#0f766e",
+            marginBottom: 16,
+            marginRight: 12,
+          }}
+        >
+          🎹 Pianoforte/jazz/maggiori
+
+        </button>
+        <button
+          onClick={salvaPianoforteJazzMinore}
+          style={{
+            ...styles.saveButton,
+            backgroundColor: "#0f766e",
+            marginBottom: 16,
+            marginRight: 12,
+          }}
+        >
+          🎹 Pianoforte/jazz/minori
+
+        </button>
+
 
       <h2 style={{ marginBottom: 12 }}>Aggiungi cosa da fare</h2>
 
@@ -807,6 +1391,20 @@ const salvaTutteLeModifiche = async () => {
           </button>
         )}
       </div>
+      <button
+        onClick={eliminaTutteLeCoseDaFare}
+        style={{
+          ...styles.deleteButton,
+          borderRadius: 6,
+          width: "auto",
+          height: "auto",
+          padding: "10px 16px",
+          marginRight: 12,
+          marginBottom: 16,
+        }}
+      >
+        🗑 Elimina tutte le cose da fare di oggi
+      </button>
 
 
       <button
