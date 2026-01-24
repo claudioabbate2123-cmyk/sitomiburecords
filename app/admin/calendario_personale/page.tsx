@@ -47,6 +47,8 @@ export default function SalaProveCalendar() {
   const [month, setMonth] = useState(today.getMonth());
   const [year, setYear] = useState(today.getFullYear());
   const [eventiPersonali, setEventiPersonali] = useState<Appuntamento[]>([]);
+ 
+
 
   /* ================= CALCOLO GIORNI ================= */
 

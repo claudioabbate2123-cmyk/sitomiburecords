@@ -3,6 +3,139 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@supabase/supabase-js";
+/* ================= COSE DA CONCERTO ================= */
+
+export const COSE_CONCERTO = [
+  "tastiera grande",
+  "tastiera piccola",
+  "cavo di collegamento tra tastiere",
+  "pedale tastiera piccola",
+  "pedale tastiera grande",
+  "caricatore tastiera grande",
+  "caricatore tastiera piccola",
+  "tablet",
+  "caricatore tablet",
+  "caricatore telefono",
+  "Penna tablet",
+  "leggio",
+  "reggitastiera singolo",
+  "reggitastiera doppio",
+  "cavo jack per tastiera/mixer",
+];
+
+/* ================= ATTIVITÀ DI CASA ================= */
+
+export const ATTIVITA_CASA = [
+  "lavare piatti",
+  "mettere a posto la spesa",
+  "spazzare per terra cucina",
+  "pulire bagno",
+  "pulire superfici cucinina",
+  "lavare scola piatti",
+  "pulire piatto doccia",
+  "rifare il letto",
+  "spazzare stanza da letto",
+  "lavare pavimento",
+  "cucinare cena",
+  "cucinare pranzo",
+  "aspirare insettini tutte le stanze",
+  "sparecchiare",
+  "mettere a posto in cucina",
+  "buttare mondezza",
+];
+
+/* ================= PIANOFORTE / JAZZ ================= */
+
+export const PIANOFORTE_JAZZ = [
+  "Impro standard accordi e melodia",
+  "Impro standard wolking e melodia",
+  "Impro standard piano solo",
+  "Impro standard stride piano",
+  "accompagnamento standard drop2",
+  "accompagnamento walking accordi standard",
+  "tema Donna lee",
+  "tema Spain",
+  "tema Billie's Bounce",
+  "tema Blue Bossa",
+  "tema Solar",
+  "tema Recordame",
+  "tema Black Orpheus",
+];
+
+/* ================= PIANOFORTE / JAZZ / MAGGIORI ================= */
+
+export const PIANOFORTE_JAZZ_MAGGIORI = [
+  "frasi II V I maggiori",
+  "accompagnamento drop 2 II V I maggiori",
+  "accompagnamento drop 2 con rivolti II V I maggiori",
+  "accompagnamento walking sinistra accordi destra II V I maggiori A B",
+  "II V I maggiori mano sinistra A B",
+  "accompagnamento piano solo II V I maggiori A B",
+];
+
+/* ================= PIANOFORTE / JAZZ / MINORI ================= */
+
+export const PIANOFORTE_JAZZ_MINORI = [
+  "frasi II V I minori",
+  "accompagnamento drop 2 II V I minori",
+  "accompagnamento drop 2 con rivolti II V I minori",
+  "accompagnamento walking sinistra accordi destra II V I minori A B",
+  "II V I minori mano sinistra A B",
+  "accompagnamento piano solo II V I minori A B",
+];
+
+/* ================= SPORT ================= */
+
+export const SPORT = [
+  "correre almeno 1 h",
+  "almeno 21 flessioni",
+  "almeno 25 addominali",
+];
+
+/* ================= TECNICA PIANOFORTE MAGGIORE ================= */
+
+export const TECNICA_PIANOFORTE_MAGGIORE = [
+  "scale maggiori",
+  "scale pentatoniche maggiori",
+  "scale lidie",
+  "scale misolidie",
+  "arpeggi CEGC sinistra",
+  "arpeggi CEGC destra",
+   "arpeggi CEGC mani unite",
+];
+
+/* ================= TECNICA PIANOFORTE MINORE ================= */
+
+export const TECNICA_PIANOFORTE_MINORE = [
+  "scale minori melodiche",
+  "scale minori armoniche",
+  "scale minori naturali",
+  "scale doriche",
+  "scale frigie",
+  "scale locrie",
+  "scale superlocrie",
+  "scale semitono-tono",
+  "scale pentatoniche minori",
+  "scale Blues",
+  "arpeggi CEbGC sinistra",
+  "arpeggi CEbGC destra",
+  "arpeggi CEbGC mani unite",
+];
+/* ================= SPESA ================= */
+
+export const SPESA = [
+  "caffè deca e caffè normale",
+  "pellicola trasparente",
+  "cassa d'acqua",
+  "scottex",
+  "banane",
+  "burro d'arachidi",
+  "verdura",
+  "insalata",
+  "alicette",
+  "limoni",
+  "mirtilli",
+];
 
 /* ================= SUPABASE ================= */
 
@@ -410,188 +543,46 @@ const salvaTutteLeModifiche = async () => {
   setLoading(false);
   alert("Cose da fare rimandate a domani");
 };
-/* ================= COSE DA CONCERTO ================= */
+/* ================= FUNZIONE ASTRATTA COSE DA FARE ================= */
 
-const salvaCoseDaConcerto = async () => {
+const salvaListaPerCategoria = async (
+  categoria: string,
+  lista: string[]
+) => {
   if (!dataSelezionata) return;
 
   setLoading(true);
 
-  const lista = [
-    "tastiera grande",
-    "tastiera piccola",
-    "cavo di collegamento tra tastiere",
-    "pedale tastiera piccola",
-    "pedale tastiera grande",
-    "caricatore tastiera grande",
-    "caricatore tastiera piccola",
-    "tablet",
-    "caricatore tablet",
-    "caricatore telefono",
-    "Penna tablet",
-    "leggio",
-    "reggitastiera singolo",
-    "reggitastiera doppio",
-    "cavo jack per tastiera/mixer",
-  ];
-
-  // assicura categoria Concerto
+  // 1️⃣ assicura categoria (senza duplicati)
   const { data: cat } = await supabase
     .from("categorie_cose_da_fare")
     .select("id")
-    .eq("nome", "Concerto")
+    .eq("nome", categoria)
     .maybeSingle();
 
   if (!cat) {
     await supabase.from("categorie_cose_da_fare").insert({
-      nome: "Concerto",
+      nome: categoria,
     });
   }
 
-  // evita duplicati per lo stesso giorno
+  // 2️⃣ evita duplicati per lo stesso giorno
   const { data: esistenti } = await supabase
     .from("cose_da_fare")
     .select("elemento")
     .eq("data", dataSelezionata)
-    .eq("categoria", "Concerto");
+    .eq("categoria", categoria);
 
   const presenti = new Set(esistenti?.map((e) => e.elemento));
 
+  // 3️⃣ prepara inserimento
   const daInserire = lista
     .filter((e) => !presenti.has(e))
     .map((e) => ({
       elemento: e,
       fatto: false,
       data: dataSelezionata,
-      categoria: "Concerto",
-    }));
-
-  if (daInserire.length > 0) {
-    await supabase.from("cose_da_fare").insert(daInserire);
-  }
-
-  await fetchCoseDaFare();
-  await fetchCategorie();
-  setLoading(false);
-};
-/* ================= ATTIVITA' DI CASA ================= */
-
-const salvaAttivitaDiCasa = async () => {
-  if (!dataSelezionata) return;
-
-  setLoading(true);
-
-  const lista = [
-    "lavare piatti",
-    "mettere a posto la spesa",
-    "spazzare per terra cucina",
-    "pulire bagno",
-    "pulire superfici cucinina",
-    "lavare scola piatti",
-    "pulire piatto doccia",
-    "rifare il letto",
-    "spazzare stanza da letto",
-    "lavare pavimento",
-    "cucinare cena",
-    "cucinare pranzo",
-    "aspirare insettini tutte le stanze",
-    "sparecchiare",
-    "mettere a posto in cucina",
-    "buttare mondezza",
-  ];
-
-  // assicura categoria Attività di casa
-  const { data: cat } = await supabase
-    .from("categorie_cose_da_fare")
-    .select("id")
-    .eq("nome", "attività di casa")
-    .maybeSingle();
-
-  if (!cat) {
-    await supabase.from("categorie_cose_da_fare").insert({
-      nome: "attivita di casa",
-    });
-  }
-
-  // evita duplicati per lo stesso giorno
-  const { data: esistenti } = await supabase
-    .from("cose_da_fare")
-    .select("elemento")
-    .eq("data", dataSelezionata)
-    .eq("categoria", "attivita di casa");
-
-  const presenti = new Set(esistenti?.map((e) => e.elemento));
-
-  const daInserire = lista
-    .filter((e) => !presenti.has(e))
-    .map((e) => ({
-      elemento: e,
-      fatto: false,
-      data: dataSelezionata,
-      categoria: "attivita di casa",
-    }));
-
-  if (daInserire.length > 0) {
-    await supabase.from("cose_da_fare").insert(daInserire);
-  }
-
-  await fetchCoseDaFare();
-  await fetchCategorie();
-  setLoading(false);
-};
-
-/* ================= Pianoforte/Jazz ================= */
-
-const salvaPianoforteJazz = async () => {
-  if (!dataSelezionata) return;
-
-  setLoading(true);
-
-  const lista = [
-    "Impro standard accordi e melodia",
-    "Impro standard wolking e melodia",
-    "Impro standard piano solo",
-    "Impro standard stride piano",
-    "accompagnamento standard drop2",
-    "accompagnamento walking accordi standard",
-    "tema Donna lee",
-    "tema Spain",
-    "tema Billie's Bounce",
-    "tema Blue Bossa",
-    "tema Solar",
-    "tema Recordame",
-    "tema Black Orpheus",
-  ];
-
-  // assicura categoria Pianoforte/Jazz
-  const { data: cat } = await supabase
-    .from("categorie_cose_da_fare")
-    .select("id")
-    .eq("nome", "pianoforte/jazz")
-    .maybeSingle();
-
-  if (!cat) {
-    await supabase.from("categorie_cose_da_fare").insert({
-      nome: "pianoforte/jazz",
-    });
-  }
-
-  // evita duplicati per lo stesso giorno
-  const { data: esistenti } = await supabase
-    .from("cose_da_fare")
-    .select("elemento")
-    .eq("data", dataSelezionata)
-    .eq("categoria", "pianoforte/jazz");
-
-  const presenti = new Set(esistenti?.map((e) => e.elemento));
-
-  const daInserire = lista
-    .filter((e) => !presenti.has(e))
-    .map((e) => ({
-      elemento: e,
-      fatto: false,
-      data: dataSelezionata,
-      categoria: "pianoforte/jazz",
+      categoria,
     }));
 
   if (daInserire.length > 0) {
@@ -604,170 +595,7 @@ const salvaPianoforteJazz = async () => {
 };
 
 
-/* ================= Pianoforte/Jazz/Maggiori ================= */
 
-const salvaPianoforteJazzMaggiore = async () => {
-  if (!dataSelezionata) return;
-
-  setLoading(true);
-
-  const lista = [
-    "frasi II V I maggiori",
-    "accompagnamento drop 2 II V I maggiori",
-    "accompagnamento drop 2 con rivolti II V I maggiori",
-    "accompagnamento walking sinistra accordi destra II V I maggiori A B",
-    "II V I maggiori mano sinistra A B",
-    "accompagnamento piano solo II V I maggiori A B",
-  ];
-
-  // assicura categoria Attività di casa
-  const { data: cat } = await supabase
-    .from("categorie_cose_da_fare")
-    .select("id")
-    .eq("nome", "pianoforte/jazz/maggiori")
-    .maybeSingle();
-
-  if (!cat) {
-    await supabase.from("categorie_cose_da_fare").insert({
-      nome: "pianoforte/jazz/maggiori",
-    });
-  }
-
-  // evita duplicati per lo stesso giorno
-  const { data: esistenti } = await supabase
-    .from("cose_da_fare")
-    .select("elemento")
-    .eq("data", dataSelezionata)
-    .eq("categoria", "pianoforte/jazz/maggiori");
-
-  const presenti = new Set(esistenti?.map((e) => e.elemento));
-
-  const daInserire = lista
-    .filter((e) => !presenti.has(e))
-    .map((e) => ({
-      elemento: e,
-      fatto: false,
-      data: dataSelezionata,
-      categoria: "pianoforte/jazz/maggiori",
-    }));
-
-  if (daInserire.length > 0) {
-    await supabase.from("cose_da_fare").insert(daInserire);
-  }
-
-  await fetchCoseDaFare();
-  await fetchCategorie();
-  setLoading(false);
-};
-/* ================= Pianoforte/Jazz/minori ================= */
-
-const salvaPianoforteJazzMinore = async () => {
-  if (!dataSelezionata) return;
-
-  setLoading(true);
-
-  const lista = [
-    "frasi II V I minori",
-    "accompagnamento drop 2 II V I minori",
-    "accompagnamento drop 2 con rivolti II V I minori",
-    "accompagnamento walking sinistra accordi destra II V I minori A B",
-    "II V I minori mano sinistra A B",
-    "accompagnamento piano solo II V I minori A B",
-  ];
-
-  // assicura categoria Attività di casa
-  const { data: cat } = await supabase
-    .from("categorie_cose_da_fare")
-    .select("id")
-    .eq("nome", "pianoforte/jazz/minori")
-    .maybeSingle();
-
-  if (!cat) {
-    await supabase.from("categorie_cose_da_fare").insert({
-      nome: "pianoforte/jazz/minori",
-    });
-  }
-
-  // evita duplicati per lo stesso giorno
-  const { data: esistenti } = await supabase
-    .from("cose_da_fare")
-    .select("elemento")
-    .eq("data", dataSelezionata)
-    .eq("categoria", "pianoforte/jazz/minori");
-
-  const presenti = new Set(esistenti?.map((e) => e.elemento));
-
-  const daInserire = lista
-    .filter((e) => !presenti.has(e))
-    .map((e) => ({
-      elemento: e,
-      fatto: false,
-      data: dataSelezionata,
-      categoria: "pianoforte/jazz/minori",
-    }));
-
-  if (daInserire.length > 0) {
-    await supabase.from("cose_da_fare").insert(daInserire);
-  }
-
-  await fetchCoseDaFare();
-  await fetchCategorie();
-  setLoading(false);
-};
-
-
-/* ================= Sport ================= */
-
-const salvaSport = async () => {
-  if (!dataSelezionata) return;
-
-  setLoading(true);
-
-  const lista = [
-    "correre almeno 1 h",
-    "almeno 21 flessioni",
-    "almeno 25 addominali",
-  ];
-
-  // assicura categoria Attività di casa
-  const { data: cat } = await supabase
-    .from("categorie_cose_da_fare")
-    .select("id")
-    .eq("nome", "sport")
-    .maybeSingle();
-
-  if (!cat) {
-    await supabase.from("categorie_cose_da_fare").insert({
-      nome: "sport",
-    });
-  }
-
-  // evita duplicati per lo stesso giorno
-  const { data: esistenti } = await supabase
-    .from("cose_da_fare")
-    .select("elemento")
-    .eq("data", dataSelezionata)
-    .eq("categoria", "sport");
-
-  const presenti = new Set(esistenti?.map((e) => e.elemento));
-
-  const daInserire = lista
-    .filter((e) => !presenti.has(e))
-    .map((e) => ({
-      elemento: e,
-      fatto: false,
-      data: dataSelezionata,
-      categoria: "sport",
-    }));
-
-  if (daInserire.length > 0) {
-    await supabase.from("cose_da_fare").insert(daInserire);
-  }
-
-  await fetchCoseDaFare();
-  await fetchCategorie();
-  setLoading(false);
-};
 
 /* ================= AGGIUNGI COSE "SITO MIBU" A OGGI (NO FUTURO) ================= */
 
@@ -1023,7 +851,7 @@ const eliminaTutteLeCoseDaFare = async () => {
       {/* COSE DA FARE */}
 
       <button
-        onClick={salvaCoseDaConcerto}
+        onClick={() => salvaListaPerCategoria("Concerto", COSE_CONCERTO)}
         style={{
           ...styles.saveButton,
           backgroundColor: "#0f766e",
@@ -1031,11 +859,11 @@ const eliminaTutteLeCoseDaFare = async () => {
           marginRight: 12,
         }}
       >
-        🎤 Cose da concerto
+        🎤 Concerto
       </button>
 
         <button
-          onClick={salvaAttivitaDiCasa}
+          onClick={() => salvaListaPerCategoria("attivita di casa", ATTIVITA_CASA)}
           style={{
             ...styles.saveButton,
             backgroundColor: "#0f766e",
@@ -1045,6 +873,18 @@ const eliminaTutteLeCoseDaFare = async () => {
         >
           🏠 Attività di casa
         </button>
+        <button
+        onClick={() => salvaListaPerCategoria("spesa", SPESA)}
+        style={{
+          ...styles.saveButton,
+          backgroundColor: "#0f766e",
+          marginBottom: 16,
+          marginRight: 12,
+        }}
+      >
+        🛒 Spesa
+      </button>
+
         <button
           onClick={aggiungiSitoMibuAOggi}
           style={{
@@ -1070,7 +910,7 @@ const eliminaTutteLeCoseDaFare = async () => {
 
         </button>
         <button
-          onClick={salvaSport}
+          onClick={() => salvaListaPerCategoria("sport", SPORT)}
           style={{
             ...styles.saveButton,
             backgroundColor: "#0f766e",
@@ -1082,7 +922,7 @@ const eliminaTutteLeCoseDaFare = async () => {
 
         </button>
         <button
-          onClick={salvaPianoforteJazz}
+          onClick={() => salvaListaPerCategoria("pianoforte/jazz", PIANOFORTE_JAZZ)}
           style={{
             ...styles.saveButton,
             backgroundColor: "#0f766e",
@@ -1094,7 +934,11 @@ const eliminaTutteLeCoseDaFare = async () => {
 
         </button>
         <button
-          onClick={salvaPianoforteJazzMaggiore}
+          onClick={() =>
+    salvaListaPerCategoria(
+      "pianoforte/jazz/maggiori",
+      PIANOFORTE_JAZZ_MAGGIORI
+    )}
           style={{
             ...styles.saveButton,
             backgroundColor: "#0f766e",
@@ -1106,7 +950,11 @@ const eliminaTutteLeCoseDaFare = async () => {
 
         </button>
         <button
-          onClick={salvaPianoforteJazzMinore}
+          onClick={() =>
+    salvaListaPerCategoria(
+      "pianoforte/jazz/minori",
+      PIANOFORTE_JAZZ_MINORI
+    )}
           style={{
             ...styles.saveButton,
             backgroundColor: "#0f766e",
@@ -1115,6 +963,38 @@ const eliminaTutteLeCoseDaFare = async () => {
           }}
         >
           🎹 Pianoforte/jazz/minori
+
+        </button>
+        <button
+          onClick={() =>
+    salvaListaPerCategoria(
+      "tecnica pianoforte maggiore",
+      TECNICA_PIANOFORTE_MAGGIORE
+    )}
+          style={{
+            ...styles.saveButton,
+            backgroundColor: "#0f766e",
+            marginBottom: 16,
+            marginRight: 12,
+          }}
+        >
+          🎹 Tecnica pianoforte maggiore
+
+        </button>
+        <button
+          onClick={() =>
+    salvaListaPerCategoria(
+      "tecnica pianoforte minore",
+      TECNICA_PIANOFORTE_MINORE
+    )}
+          style={{
+            ...styles.saveButton,
+            backgroundColor: "#0f766e",
+            marginBottom: 16,
+            marginRight: 12,
+          }}
+        >
+          🎹 Tecnica pianoforte minore
 
         </button>
 
@@ -1391,6 +1271,15 @@ const eliminaTutteLeCoseDaFare = async () => {
           </button>
         )}
       </div>
+      
+
+
+      <button
+        style={styles.backButton}
+        onClick={() => router.push("/admin/calendario_personale")}
+      >
+        ← Torna al calendario
+      </button>
       <button
         onClick={eliminaTutteLeCoseDaFare}
         style={{
@@ -1404,14 +1293,6 @@ const eliminaTutteLeCoseDaFare = async () => {
         }}
       >
         🗑 Elimina tutte le cose da fare di oggi
-      </button>
-
-
-      <button
-        style={styles.backButton}
-        onClick={() => router.push("/admin/calendario_personale")}
-      >
-        ← Torna al calendario
       </button>
 
       {loading && <p style={{ color: "#111" }}>Salvataggio…</p>}
@@ -1498,6 +1379,7 @@ const styles: Record<string, React.CSSProperties> = {
     borderRadius: 6,
     fontSize: 14,
     cursor: "pointer",
+    marginRight:12,
   },
   deleteButton: {
     backgroundColor: "#ef4444",
