@@ -49,6 +49,11 @@ export default function AdminDashboard() {
         <Link href="/admin/calendario_personale" style={styles.card}>
           <h2>📅 Calendario personale</h2>
         </Link>
+        <Link
+          href="/admin/bilancio_mensile_personale"style={styles.card}>
+          <h2>💰 Bilancio mensile</h2>
+        </Link>
+
       </div>
     </main>
   );

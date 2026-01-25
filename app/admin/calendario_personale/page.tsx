@@ -19,6 +19,7 @@ type Appuntamento = {
   nome_evento: string;
   ora_inizio: string;
   ora_fine: string;
+  guadagno:number;
 };
 
 /* ================= COSTANTI ================= */
@@ -47,6 +48,11 @@ export default function SalaProveCalendar() {
   const [month, setMonth] = useState(today.getMonth());
   const [year, setYear] = useState(today.getFullYear());
   const [eventiPersonali, setEventiPersonali] = useState<Appuntamento[]>([]);
+  const formatOra = (ora: string) => {
+    const [h, m] = ora.slice(0, 5).split(":");
+    return m === "00" ? String(Number(h)) : `${Number(h)}:${m}`;
+  };
+
  
 
 
@@ -92,7 +98,7 @@ export default function SalaProveCalendar() {
 
       const { data, error } = await supabase
         .from("calendario_personale")
-        .select("id, data, nome_evento, ora_inizio, ora_fine")
+        .select("id, data, nome_evento, ora_inizio, ora_fine, guadagno")
         .gte("data", start)
         .lte("data", end);
 
@@ -118,7 +124,7 @@ export default function SalaProveCalendar() {
       {/* BOTTONE DASHBOARD */}
       <button
         style={styles.dashboardButton}
-        onClick={() => router.push("/admin/dashboard")}
+        onClick={() => router.push("/admin/dashboardareapersonale")}
       >
         ← Torna alla dashboard
       </button>
@@ -198,9 +204,12 @@ export default function SalaProveCalendar() {
                 <div key={e.id} style={styles.event}>
                   <strong>{e.nome_evento}</strong>
                   <div>
-                    {e.ora_inizio.slice(0, 5)} –{" "}
-                    {e.ora_fine.slice(0, 5)}
+                    {formatOra(e.ora_inizio)} – {formatOra(e.ora_fine)}
+                     {" "} {Number.isInteger(e.guadagno)
+                              ? e.guadagno
+                              : e.guadagno.toFixed(2)} {" "}€ 
                   </div>
+
                 </div>
               ))}
             </div>

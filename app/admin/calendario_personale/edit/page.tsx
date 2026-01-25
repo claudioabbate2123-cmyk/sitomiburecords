@@ -135,6 +135,7 @@ export const SPESA = [
   "alicette",
   "limoni",
   "mirtilli",
+  "uova",
 ];
 
 /* ================= SUPABASE ================= */
@@ -152,6 +153,7 @@ type Appuntamento = {
   ora_inizio: string;
   ora_fine: string;
   nome_evento: string;
+  guadagno:number;
 };
 
 type CosaDaFare = {
@@ -187,6 +189,7 @@ export default function CalendarioPersonaleEditPage() {
     ora_inizio: "",
     ora_fine: "",
     nome_evento: "",
+    guadagno: 0,
   });
 
   const [nuovaCosaDaFare, setNuovaCosaDaFare] = useState({
@@ -211,7 +214,7 @@ export default function CalendarioPersonaleEditPage() {
 
     const { data } = await supabase
       .from("calendario_personale")
-      .select("id, data, ora_inizio, ora_fine, nome_evento")
+      .select("id, data, ora_inizio, ora_fine, nome_evento, guadagno")
       .eq("data", dataSelezionata)
       .order("ora_inizio");
 
@@ -268,12 +271,12 @@ export default function CalendarioPersonaleEditPage() {
   const updateEvento = async (
     id: number,
     field: keyof Appuntamento,
-    value: string
+    value: string |number
   ) => {
     setLoading(true);
     await supabase
       .from("calendario_personale")
-      .update({ [field]: value })
+      .update({ [field]: field === "guadagno" ? Number(value) : value })
       .eq("id", id);
     setLoading(false);
   };
@@ -452,6 +455,7 @@ const salvaTutteLeModifiche = async () => {
       ora_inizio: "",
       ora_fine: "",
       nome_evento: "",
+      guadagno: 0,
     }));
 
     setLoading(false);
@@ -787,6 +791,22 @@ const eliminaTutteLeCoseDaFare = async () => {
             }
           />
         </div>
+        <div style={styles.field}>
+          <label style={styles.label}>Guadagno (€)</label>
+          <input
+            style={styles.input}
+            type="number"
+            step="0.01"
+            value={nuovoEvento.guadagno}
+            onChange={(e) =>
+              setNuovoEvento({
+                ...nuovoEvento,
+                guadagno: parseFloat(e.target.value) || 0,
+              })
+            }
+          />
+        </div>
+
       </div>
 
       <button onClick={salvaNuovoEvento} style={styles.saveButton}>
@@ -794,57 +814,71 @@ const eliminaTutteLeCoseDaFare = async () => {
       </button>
       {/*APPUNTAMENTI SELECT UPDATE DELETE */}
       <table style={styles.table}>
-  <thead>
-    <tr>
-      <th style={styles.th}>Nome evento</th>
-      <th style={styles.th}>Ora inizio</th>
-      <th style={styles.th}>Ora fine</th>
-      <th style={styles.th}>Azioni</th>
-    </tr>
-  </thead>
-  <tbody>
-    {eventi.map((e) => (
-      <tr key={e.id}>
-        <td style={styles.td}>
-          <input
-            style={styles.input}
-            defaultValue={e.nome_evento}
-            onBlur={(ev) =>
-              updateEvento(e.id, "nome_evento", ev.target.value)
-            }
-          />
-        </td>
-        <td style={styles.td}>
-          <input
-            style={styles.input}
-            type="time"
-            defaultValue={e.ora_inizio.slice(0, 5)}
-            onBlur={(ev) =>
-              updateEvento(e.id, "ora_inizio", ev.target.value)
-            }
-          />
-        </td>
-        <td style={styles.td}>
-          <input
-            style={styles.input}
-            type="time"
-            defaultValue={e.ora_fine.slice(0, 5)}
-            onBlur={(ev) =>
-              updateEvento(e.id, "ora_fine", ev.target.value)
-            }
-          />
-        </td>
-        <td style={{ ...styles.td, textAlign: "center" }}>
-          <button
-            onClick={() => eliminaEvento(e.id)}
-            style={styles.deleteButton}
-          >
-            ✕
-          </button>
-        </td>
-      </tr>
-    ))}
-  </tbody>
+        <thead>
+          <tr>
+            <th style={styles.th}>Nome evento</th>
+            <th style={styles.th}>Ora inizio</th>
+            <th style={styles.th}>Ora fine</th>
+            <th style={styles.th}>Guadagno (€)</th>
+            <th style={styles.th}>Azioni</th>
+          </tr>
+        </thead>
+        <tbody>
+          {eventi.map((e) => (
+            <tr key={e.id}>
+              <td style={styles.td}>
+                <input
+                  style={styles.input}
+                  defaultValue={e.nome_evento}
+                  onBlur={(ev) =>
+                    updateEvento(e.id, "nome_evento", ev.target.value)
+                  }
+                />
+              </td>
+              <td style={styles.td}>
+                <input
+                  style={styles.input}
+                  type="time"
+                  defaultValue={e.ora_inizio.slice(0, 5)}
+                  onBlur={(ev) =>
+                    updateEvento(e.id, "ora_inizio", ev.target.value)
+                  }
+                />
+              </td>
+              <td style={styles.td}>
+                <input
+                  style={styles.input}
+                  type="time"
+                  defaultValue={e.ora_fine.slice(0, 5)}
+                  onBlur={(ev) =>
+                    updateEvento(e.id, "ora_fine", ev.target.value)
+                  }
+                />
+              </td>
+              <td style={styles.td}>
+                <input
+                  style={styles.input}
+                  type="number"
+                  step="0.01"
+                  defaultValue={e.guadagno}
+                  onBlur={(ev) =>
+                    updateEvento(e.id, "guadagno", ev.target.value)
+                  }
+                />
+              </td>
+          
+
+              <td style={{ ...styles.td, textAlign: "center" }}>
+                <button
+                  onClick={() => eliminaEvento(e.id)}
+                  style={styles.deleteButton}
+                >
+                  ✕
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
 </table>
 
 
