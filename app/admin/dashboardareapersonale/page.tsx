@@ -51,7 +51,15 @@ export default function AdminDashboard() {
         </Link>
         <Link
           href="/admin/bilancio_mensile_personale"style={styles.card}>
-          <h2>💰 Bilancio mensile</h2>
+          <h2>💰 Bilancio economico</h2>
+        </Link>
+        <Link
+          href="/admin/monitoraggio_peso"style={styles.card}>
+          <h2>⚖️ Monitoraggio peso</h2>
+        </Link>
+        <Link
+          href="/admin/sport"style={styles.card}>
+          <h2>🏃Sport</h2>
         </Link>
 
       </div>
