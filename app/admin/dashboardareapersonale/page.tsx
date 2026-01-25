@@ -61,6 +61,10 @@ export default function AdminDashboard() {
           href="/admin/sport"style={styles.card}>
           <h2>🏃Sport</h2>
         </Link>
+        <Link
+          href="/admin/sport"style={styles.card}>
+          <h2>🧠 Potenziamento</h2>
+        </Link>
 
       </div>
     </main>

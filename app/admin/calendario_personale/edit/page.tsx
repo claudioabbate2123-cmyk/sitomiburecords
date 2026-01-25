@@ -130,12 +130,18 @@ export const SPESA = [
   "scottex",
   "banane",
   "burro d'arachidi",
-  "verdura",
   "insalata",
   "alicette",
   "limoni",
   "mirtilli",
   "uova",
+  "pollo",
+  "zucchine",
+  "pomodori",
+  "olive",
+  "cavolo romanesco",
+  "cavolo bianco",
+  "cavolo siciliano"
 ];
 
 /* ================= SUPABASE ================= */
@@ -871,6 +877,7 @@ const eliminaTutteLeCoseDaFare = async () => {
               <td style={{ ...styles.td, textAlign: "center" }}>
                 <button
                   onClick={() => eliminaEvento(e.id)}
+                  onTouchStart={() => eliminaEvento(e.id)}
                   style={styles.deleteButton}
                 >
                   ✕
@@ -1269,6 +1276,7 @@ const eliminaTutteLeCoseDaFare = async () => {
 
                 <button
                   onClick={() => eliminaCosaDaFare(c.id)}
+                  onTouchStart={() => eliminaCosaDaFare(c.id)}
                   style={styles.deleteButton}
                 >
                   ✕
@@ -1415,14 +1423,18 @@ const styles: Record<string, React.CSSProperties> = {
     cursor: "pointer",
     marginRight:12,
   },
-  deleteButton: {
+ deleteButton: {
     backgroundColor: "#ef4444",
     color: "#fff",
     border: "none",
-    borderRadius: "50%",
-    width: 28,
-    height: 28,
-    fontSize: 16,
+    borderRadius: 8,
+    width: 44,
+    height: 44,
+    fontSize: 18,
     cursor: "pointer",
-  },
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+},
+
 };
