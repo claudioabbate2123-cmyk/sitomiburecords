@@ -93,6 +93,7 @@ export default function CategorieCoseDaFarePage() {
               <td style={{ ...styles.td, textAlign: "center" }}>
                 <button
                   onClick={() => eliminaCategoria(c.id, c.nome)}
+                  onTouchStart={() => eliminaCategoria(c.id,c.nome)}
                   style={styles.deleteButton}
                 >
                   ✕
@@ -159,11 +160,13 @@ const styles: Record<string, React.CSSProperties> = {
     backgroundColor: "#ef4444",
     color: "#fff",
     border: "none",
-    borderRadius: "50%",
-    width: 28,
-    height: 28,
-    fontSize: 16,
+    borderRadius: 8,
+    width: 44,
+    height: 44,
+    fontSize: 18,
     cursor: "pointer",
+    alignItems: "center",
+    justifyContent: "center",
   },
   backButton: {
     backgroundColor: "#f3f4f6",

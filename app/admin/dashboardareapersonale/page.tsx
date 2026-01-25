@@ -65,6 +65,14 @@ export default function AdminDashboard() {
           href="/admin/sport"style={styles.card}>
           <h2>🧠 Potenziamento</h2>
         </Link>
+        <Link
+          href="/admin/cose_da_fare_prima_o_poi"style={styles.card}>
+          <h2>📝 Cose da fare</h2>
+        </Link>
+        <Link
+          href="/admin/spese_personali"style={styles.card}>
+          <h2>💳 Spese</h2>
+        </Link>
 
       </div>
     </main>
