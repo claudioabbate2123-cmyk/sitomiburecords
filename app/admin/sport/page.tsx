@@ -10,16 +10,6 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
-type SportRecord = {
-  id: number;
-  data: string;
-  ore: number;
-  minuti: number;
-  secondi: number;
-  flessioni: number;
-  addominali: number;
-};
-
 export default function SportPage() {
   const router = useRouter();
 
@@ -33,9 +23,9 @@ export default function SportPage() {
   const [running, setRunning] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
-  /* ================= CONTATORI ================= */
-  const [flessioni, setFlessioni] = useState(0);
-  const [addominali, setAddominali] = useState(0);
+  /* ================= CONTATORI (STRINGHE!) ================= */
+  const [flessioni, setFlessioni] = useState("");
+  const [addominali, setAddominali] = useState("");
 
   /* ================= LOAD RECORD ================= */
   const fetchSport = async () => {
@@ -48,13 +38,13 @@ export default function SportPage() {
     if (data) {
       setRecordId(data.id);
       setSeconds(data.ore * 3600 + data.minuti * 60 + data.secondi);
-      setFlessioni(data.flessioni);
-      setAddominali(data.addominali);
+      setFlessioni(String(data.flessioni));
+      setAddominali(String(data.addominali));
     } else {
       setRecordId(null);
       setSeconds(0);
-      setFlessioni(0);
-      setAddominali(0);
+      setFlessioni("");
+      setAddominali("");
     }
   };
 
@@ -77,11 +67,6 @@ export default function SportPage() {
     };
   }, [running]);
 
-  const resetTimer = () => {
-    setSeconds(0);
-    setRunning(false);
-  };
-
   /* ================= FORMAT ================= */
   const ore = Math.floor(seconds / 3600);
   const minuti = Math.floor((seconds % 3600) / 60);
@@ -96,8 +81,8 @@ export default function SportPage() {
       ore,
       minuti,
       secondi,
-      flessioni,
-      addominali,
+      flessioni: Number(flessioni),
+      addominali: Number(addominali),
     };
 
     if (recordId) {
@@ -122,7 +107,6 @@ export default function SportPage() {
 
       <h1 style={styles.title}>🏋️ Sport</h1>
 
-      {/* DATA */}
       <input
         type="date"
         value={dataSelezionata}
@@ -130,42 +114,48 @@ export default function SportPage() {
         style={styles.input}
       />
 
-      {/* CRONOMETRO */}
       <div style={styles.timer}>
         {format(ore)}:{format(minuti)}:{format(secondi)}
       </div>
 
       <div style={styles.controls}>
         {!running ? (
-          <button onClick={() => setRunning(true)}>▶️ Start</button>
+          <button style={styles.button} onClick={() => setRunning(true)}>
+            ▶️ Start
+          </button>
         ) : (
-          <button onClick={() => setRunning(false)}>⏸ Stop</button>
+          <button style={styles.button} onClick={() => setRunning(false)}>
+            ⏸ Stop
+          </button>
         )}
 
-        <button onClick={resetTimer}>🔄 Reset</button>
-
         {!running && seconds > 0 && (
-          <button onClick={salvaTempo}>💾 Salva tempo</button>
+          <button style={styles.button} onClick={salvaTempo}>
+            💾 Salva allenamento
+          </button>
         )}
       </div>
 
-      {/* CONTATORI */}
       <div style={styles.counters}>
-        <label>
+        <label style={styles.label}>
           Flessioni
           <input
             type="number"
+            min="0"
+            inputMode="numeric"
             value={flessioni}
-            onChange={(e) => setFlessioni(Number(e.target.value))}
+            onChange={(e) => setFlessioni(e.target.value)}
           />
         </label>
 
-        <label>
+        <label style={styles.label}>
           Addominali
           <input
             type="number"
+            min="0"
+            inputMode="numeric"
             value={addominali}
-            onChange={(e) => setAddominali(Number(e.target.value))}
+            onChange={(e) => setAddominali(e.target.value)}
           />
         </label>
       </div>
@@ -208,6 +198,19 @@ const styles: Record<string, React.CSSProperties> = {
     display: "flex",
     gap: 24,
     justifyContent: "center",
+  },
+  label: {
+    display: "flex",
+    flexDirection: "column",
+    gap: 6,
+    fontSize: 14,
+  },
+  button: {
+    cursor: "pointer",
+    padding: "10px 16px",
+    borderRadius: 8,
+    border: "none",
+    fontWeight: 600,
   },
   dashboardButton: {
     position: "absolute",

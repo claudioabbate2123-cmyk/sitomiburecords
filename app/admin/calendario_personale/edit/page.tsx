@@ -141,7 +141,12 @@ export const SPESA = [
   "olive",
   "cavolo romanesco",
   "cavolo bianco",
-  "cavolo siciliano"
+  "cavolo siciliano",
+  "carta igienica",
+  "scottex",
+  "sapone piatti",
+  "sapone lavatrice",
+  "sapone mani",
 ];
 
 /* ================= SUPABASE ================= */

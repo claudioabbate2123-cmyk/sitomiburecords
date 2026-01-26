@@ -112,26 +112,34 @@ export default function MonitoraggioPeso() {
 
       {/* ===== INSERIMENTO ===== */}
       <section style={styles.card}>
-        <h2>Aggiungi misurazione</h2>
+            <h2>Aggiungi misurazione</h2>
 
-        <input
-          type="date"
-          value={data}
-          onChange={(e) => setData(e.target.value)}
-        />
+            <div style={styles.form}>
+              <input
+                type="date"
+                value={data}
+                onChange={(e) => setData(e.target.value)}
+                style={styles.input}
+              />
 
-        <input
-          type="number"
-          step="0.1"
-          placeholder="Peso (kg)"
-          value={peso}
-          onChange={(e) => setPeso(e.target.value)}
-        />
+              <input
+                type="number"
+                step="0.1"
+                placeholder="Peso (kg)"
+                value={peso}
+                onChange={(e) => setPeso(e.target.value)}
+                style={styles.input}
+              />
 
-        <button style={styles.addButton} onClick={aggiungiPeso}>
-          ➕ Aggiungi
-        </button>
+              <button
+                style={styles.addButton}
+                onClick={aggiungiPeso}
+              >
+                ➕ Aggiungi
+              </button>
+            </div>
       </section>
+
 
       {/* ===== FILTRI ===== */}
       <section style={styles.filters}>
@@ -241,8 +249,31 @@ const styles: Record<string, React.CSSProperties> = {
     gap: 12,
     marginBottom: 8,
   },
-  addButton: {
-    marginTop: 12,
-    cursor: "pointer", // 👈 manina
-  },
+  form: {
+  display: "flex",
+  flexDirection: "column",
+  gap: 12,
+},
+
+input: {
+  padding: "12px 14px",
+  fontSize: 16, // IMPORTANTISSIMO per mobile (evita zoom iOS)
+  borderRadius: 8,
+  border: "1px solid #d1d5db",
+},
+
+addButton: {
+  marginTop: 8,
+  padding: "14px",
+  fontSize: 16,
+  fontWeight: 600,
+  borderRadius: 10,
+  border: "none",
+  backgroundColor: "#2563eb",
+  color: "#fff",
+  cursor: "pointer",
+  width: "100%",
+  touchAction: "manipulation", // 👈 FIX mobile tap
+},
+
 };

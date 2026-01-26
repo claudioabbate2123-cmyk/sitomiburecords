@@ -10,7 +10,7 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
-export default function dashboardAreaPersonale() {
+export default function AdminDashboard() {
   const router = useRouter();
   const [role, setRole] = useState<string | null>(null);
 
@@ -38,40 +38,40 @@ export default function dashboardAreaPersonale() {
       {/* BOTTONE TORNA ALLA DASHBOARD */}
       <button
         style={styles.dashboardButton}
-        onClick={() => router.push("/admin/dashboard")}
+        onClick={() => router.push("/admin/dashboardareapersonale")}
       >
-        ← Torna alla dashboard admin
+        ← Torna alla dashboard
       </button>
 
       <h1>Dashboard area personale</h1>
 
       <div style={styles.grid}>
         <Link href="/admin/calendario_personale" style={styles.card}>
-          <h2>📅 Calendario personale</h2>
+          <h2>💬 Spagnolo</h2>
         </Link>
         <Link
           href="/admin/bilancio_mensile_personale"style={styles.card}>
-          <h2>💰 Bilancio economico</h2>
+          <h2>💬 Inglese</h2>
         </Link>
         <Link
           href="/admin/monitoraggio_peso"style={styles.card}>
-          <h2>⚖️ Monitoraggio peso</h2>
+          <h2>🧮 Calcolo mentale</h2>
         </Link>
         <Link
           href="/admin/sport"style={styles.card}>
-          <h2>🏃Sport</h2>
+          <h2>🎼 Intervalli/scale/accordi</h2>
         </Link>
         <Link
-          href="/admin/potenziamentoDashboard"style={styles.card}>
-          <h2>🧠 Potenziamento</h2>
+          href="/admin/sport"style={styles.card}>
+          <h2>🥁 Solfeggio ritmico</h2>
         </Link>
         <Link
           href="/admin/cose_da_fare_prima_o_poi"style={styles.card}>
-          <h2>📝 Cose da fare</h2>
+          <h2>🎹 Lettura a prima vista Piano</h2>
         </Link>
         <Link
           href="/admin/spese_personali"style={styles.card}>
-          <h2>💳 Spese</h2>
+          <h2>🧩 Memoria e memoria visiva</h2>
         </Link>
 
       </div>
@@ -105,7 +105,6 @@ const styles: Record<string, React.CSSProperties> = {
     height: 120,  
     flexShrink: 0,        // 👈 NON si rimpicciolisce
     },
-
 
   /* ===== NUOVA SEZIONE AZIONI ===== */
   actions: {
