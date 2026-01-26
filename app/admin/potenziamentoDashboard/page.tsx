@@ -73,6 +73,15 @@ export default function AdminDashboard() {
           href="/admin/spese_personali"style={styles.card}>
           <h2>🧩 Memoria e memoria visiva</h2>
         </Link>
+        <Link
+          href="/admin/spese_personali"style={styles.card}>
+          <h2>🎺Frasi jazz</h2>
+        </Link>
+        <Link
+          href="/admin/spese_personali"style={styles.card}>
+          <h2>Variazioni sul tummbao piano salsa</h2>
+        </Link>
+
 
       </div>
     </main>

@@ -66,11 +66,15 @@ export const PIANOFORTE_JAZZ = [
 
 export const PIANOFORTE_JAZZ_MAGGIORI = [
   "frasi II V I maggiori",
-  "accompagnamento drop 2 II V I maggiori",
-  "accompagnamento drop 2 con rivolti II V I maggiori",
+  "accompagnamento drop 2 II V I maggiori A B",
+  "accompagnamento drop 2 II V I maggiori A B alt",
+  "accompagnamento drop 2 con rivolti II V I maggiori A verso B",
+  "accompagnamento drop 2 con rivolti II V I maggiori B verso A",
   "accompagnamento walking sinistra accordi destra II V I maggiori A B",
   "II V I maggiori mano sinistra A B",
+  "II V I maggiori mano sinistra A B alt",
   "accompagnamento piano solo II V I maggiori A B",
+  "accompagnamento piano solo II V I maggiori A B alt",
 ];
 
 /* ================= PIANOFORTE / JAZZ / MINORI ================= */

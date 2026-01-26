@@ -41,14 +41,10 @@ export default function SpesePersonali() {
 
   const [spese, setSpese] = useState<Spesa[]>([]);
 
-  /* ================= AUTO RESIZE TEXTAREA ================= */
-
   const autoResize = (el: HTMLTextAreaElement) => {
     el.style.height = "auto";
     el.style.height = el.scrollHeight + "px";
   };
-
-  /* ================= FETCH ================= */
 
   const fetchSpese = async () => {
     const start = `${anno}-${String(mese + 1).padStart(2, "0")}-01`;
@@ -68,8 +64,6 @@ export default function SpesePersonali() {
     fetchSpese();
   }, [mese, anno]);
 
-  /* ================= INSERT ================= */
-
   const aggiungiSpesa = async () => {
     if (!nome || !valore || !data) return;
 
@@ -82,11 +76,8 @@ export default function SpesePersonali() {
     setNome("");
     setValore("");
     setData("");
-
     fetchSpese();
   };
-
-  /* ================= UPDATE ================= */
 
   const aggiornaSpesa = async (
     id: number,
@@ -101,20 +92,16 @@ export default function SpesePersonali() {
     fetchSpese();
   };
 
-  /* ================= DELETE ================= */
-
   const eliminaSpesa = async (id: number) => {
     await supabase.from("spese_personali").delete().eq("id", id);
     fetchSpese();
   };
 
-  /* ================= RENDER ================= */
-
   return (
     <main style={styles.page}>
       <h1 style={styles.title}>💸 Spese personali</h1>
 
-      {/* ===== FILTRI ===== */}
+      {/* FILTRI */}
       <div style={styles.filters}>
         <select value={mese} onChange={(e) => setMese(Number(e.target.value))}>
           {mesi.map((m, i) => (
@@ -130,58 +117,49 @@ export default function SpesePersonali() {
         </select>
       </div>
 
-      {/* ===== INSERIMENTO ===== */}
+      {/* INSERIMENTO */}
       <section style={styles.card}>
-  <h2 style={{ marginBottom: 16 }}>➕ Aggiungi spesa</h2>
+        <h2>➕ Aggiungi spesa</h2>
 
-  {/* NOME */}
-  <textarea
-    placeholder="Nome spesa"
-    value={nome}
-    rows={1}
-    onChange={(e) => {
-      setNome(e.target.value);
-      autoResize(e.target);
-    }}
-    style={styles.textarea}
-  />
+        <textarea
+          placeholder="Nome spesa"
+          value={nome}
+          rows={1}
+          onChange={(e) => {
+            setNome(e.target.value);
+            autoResize(e.target);
+          }}
+          style={styles.textarea}
+        />
 
-  {/* VALORE + DATA */}
-  <div style={styles.rowInputs}>
-    <input
-      type="number"
-      placeholder="Valore €"
-      value={valore}
-      onChange={(e) => setValore(e.target.value)}
-      style={styles.input}
-    />
+        <div style={styles.rowInputs}>
+          <input
+            type="number"
+            placeholder="Valore €"
+            value={valore}
+            onChange={(e) => setValore(e.target.value)}
+            style={styles.input}
+          />
 
-    <input
-      type="date"
-      value={data}
-      onChange={(e) => setData(e.target.value)}
-      style={styles.input}
-    />
-  </div>
+          <input
+            type="date"
+            value={data}
+            onChange={(e) => setData(e.target.value)}
+            style={styles.input}
+          />
+        </div>
 
-  {/* BOTTONE */}
-  <button style={styles.addButton} onClick={aggiungiSpesa}>
-    ➕ Aggiungi spesa
-  </button>
-</section>
+        <button style={styles.addButton} onClick={aggiungiSpesa}>
+          ➕ Aggiungi spesa
+        </button>
+      </section>
 
-
-      {/* ===== LISTA ===== */}
+      {/* LISTA */}
       <section style={styles.card}>
         <h2>Spese del mese</h2>
 
-        {spese.length === 0 && (
-          <div style={{ opacity: 0.6 }}>Nessuna spesa</div>
-        )}
-
         {spese.map((s) => (
-          <div key={s.id} style={styles.row}>
-            {/* NOME */}
+          <div key={s.id} className="spesa-row" style={styles.row}>
             <textarea
               defaultValue={s.nome}
               rows={1}
@@ -192,17 +170,14 @@ export default function SpesePersonali() {
               }}
             />
 
-            {/* VALORE */}
             <input
               type="number"
               defaultValue={s.valore}
-              style={{ width: 100 }}
               onChange={(e) =>
                 aggiornaSpesa(s.id, "valore", Number(e.target.value))
               }
             />
 
-            {/* DATA */}
             <input
               type="date"
               defaultValue={s.data}
@@ -211,17 +186,34 @@ export default function SpesePersonali() {
               }
             />
 
-            {/* ELIMINA */}
             <button
               onClick={() => eliminaSpesa(s.id)}
               style={styles.deleteButton}
-              title="Elimina spesa"
             >
               🗑
             </button>
           </div>
         ))}
       </section>
+
+      {/* ===== CSS RESPONSIVE (SOLO MOBILE) ===== */}
+      <style jsx>{`
+        @media (max-width: 640px) {
+          .spesa-row {
+            grid-template-columns: 1fr !important;
+            gap: 8px;
+          }
+
+          .spesa-row input[type="number"],
+          .spesa-row input[type="date"] {
+            width: 100%;
+          }
+
+          .spesa-row button {
+            align-self: flex-end;
+          }
+        }
+      `}</style>
     </main>
   );
 }
@@ -234,19 +226,16 @@ const styles: Record<string, React.CSSProperties> = {
     maxWidth: 900,
     margin: "0 auto",
   },
-
   title: {
     fontSize: 34,
     fontWeight: 800,
     marginBottom: 24,
   },
-
   filters: {
     display: "flex",
     gap: 16,
     marginBottom: 24,
   },
-
   card: {
     background: "#fff",
     padding: 20,
@@ -254,7 +243,6 @@ const styles: Record<string, React.CSSProperties> = {
     marginBottom: 24,
     boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
   },
-
   row: {
     display: "grid",
     gridTemplateColumns: "1fr 120px 160px 56px",
@@ -262,12 +250,28 @@ const styles: Record<string, React.CSSProperties> = {
     alignItems: "center",
     marginBottom: 12,
   },
-
- 
-
+  rowInputs: {
+    display: "grid",
+    gridTemplateColumns: "1fr 1fr",
+    gap: 12,
+    marginTop: 12,
+  },
+  input: {
+    padding: "10px 12px",
+    borderRadius: 6,
+    border: "1px solid #d1d5db",
+  },
+  textarea: {
+    resize: "none",
+    overflow: "hidden",
+    padding: "10px 12px",
+    borderRadius: 6,
+    border: "1px solid #d1d5db",
+    width: "100%",
+  },
   addButton: {
-    marginTop: 8,
-    padding: "12px 16px",
+    marginTop: 12,
+    padding: "12px",
     borderRadius: 8,
     border: "none",
     backgroundColor: "#2563eb",
@@ -275,43 +279,12 @@ const styles: Record<string, React.CSSProperties> = {
     fontWeight: 700,
     cursor: "pointer",
   },
-
   deleteButton: {
     width: 48,
     height: 48,
     borderRadius: "50%",
     border: "none",
     backgroundColor: "#fee2e2",
-    color: "#b91c1c",
-    fontSize: 20,
     cursor: "pointer",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
   },
-  rowInputs: {
-  display: "grid",
-  gridTemplateColumns: "1fr 1fr",
-  gap: 12,
-  marginTop: 12,
-},
-
-input: {
-  padding: "10px 12px",
-  borderRadius: 6,
-  border: "1px solid #d1d5db",
-  fontSize: 15,
-},
-
-textarea: {
-  resize: "none",
-  overflow: "hidden",
-  padding: "10px 12px",
-  borderRadius: 6,
-  border: "1px solid #d1d5db",
-  fontFamily: "inherit",
-  fontSize: 15,
-  width: "100%",
-},
-
 };
