@@ -42,6 +42,8 @@ export const ATTIVITA_CASA = [
   "sparecchiare",
   "mettere a posto in cucina",
   "buttare mondezza",
+  "apparecchiare",
+
 ];
 
 /* ================= PIANOFORTE / JAZZ ================= */

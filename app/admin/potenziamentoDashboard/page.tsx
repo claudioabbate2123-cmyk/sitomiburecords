@@ -43,7 +43,7 @@ export default function AdminDashboard() {
         ← Torna alla dashboard
       </button>
 
-      <h1>Dashboard area personale</h1>
+      <h1>Potenziamento Dashboard</h1>
 
       <div style={styles.grid}>
         <Link href="/admin/calendario_personale" style={styles.card}>
@@ -79,7 +79,11 @@ export default function AdminDashboard() {
         </Link>
         <Link
           href="/admin/spese_personali"style={styles.card}>
-          <h2>Variazioni sul tummbao piano salsa</h2>
+          <h2>💃 Variazioni sul tumbao piano salsa</h2>
+        </Link>
+        <Link
+          href="/admin/spese_personali"style={styles.card}>
+          <h2>🎧 Produzione musicale (CUBASE)</h2>
         </Link>
 
 

@@ -23,7 +23,7 @@ export default function SportPage() {
   const [running, setRunning] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
-  /* ================= CONTATORI (STRINGHE!) ================= */
+  /* ================= CONTATORI ================= */
   const [flessioni, setFlessioni] = useState("");
   const [addominali, setAddominali] = useState("");
 
@@ -95,6 +95,34 @@ export default function SportPage() {
     fetchSport();
   };
 
+  /* ============ STOP + AUTOSAVE ============ */
+  const stopTimer = async () => {
+    setRunning(false);
+
+    if (seconds === 0) return;
+
+    const payload = {
+      data: dataSelezionata,
+      ore,
+      minuti,
+      secondi,
+      flessioni: Number(flessioni),
+      addominali: Number(addominali),
+    };
+
+    if (recordId) {
+      await supabase.from("sport").update(payload).eq("id", recordId);
+    } else {
+      const { data } = await supabase
+        .from("sport")
+        .insert(payload)
+        .select()
+        .single();
+
+      if (data) setRecordId(data.id);
+    }
+  };
+
   /* ================= UI ================= */
   return (
     <main style={styles.page}>
@@ -124,7 +152,7 @@ export default function SportPage() {
             ▶️ Start
           </button>
         ) : (
-          <button style={styles.button} onClick={() => setRunning(false)}>
+          <button style={styles.button} onClick={stopTimer}>
             ⏸ Stop
           </button>
         )}

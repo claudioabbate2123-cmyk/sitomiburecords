@@ -3,6 +3,8 @@ export const dynamic = "force-dynamic";
 
 import { useEffect, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
+import { useRouter } from "next/navigation";
+
 
 /* ================= SUPABASE ================= */
 
@@ -30,6 +32,8 @@ const mesi = [
 /* ================= COMPONENTE ================= */
 
 export default function SpesePersonali() {
+  const router = useRouter();
+
   const today = new Date();
 
   const [mese, setMese] = useState(today.getMonth());
@@ -40,6 +44,8 @@ export default function SpesePersonali() {
   const [data, setData] = useState("");
 
   const [spese, setSpese] = useState<Spesa[]>([]);
+  const totaleMese = spese.reduce((acc, s) => acc + s.valore, 0);
+
 
   const autoResize = (el: HTMLTextAreaElement) => {
     el.style.height = "auto";
@@ -99,6 +105,13 @@ export default function SpesePersonali() {
 
   return (
     <main style={styles.page}>
+      <button
+        style={styles.dashboardButton}
+        onClick={() => router.push("/admin/dashboardareapersonale")}
+        >
+      ← Torna alla dashboard
+      </button>
+
       <h1 style={styles.title}>💸 Spese personali</h1>
 
       {/* FILTRI */}
@@ -157,7 +170,10 @@ export default function SpesePersonali() {
       {/* LISTA */}
       <section style={styles.card}>
         <h2>Spese del mese</h2>
-
+        <div style={styles.totale}>
+          Totale mese: <strong>{totaleMese.toFixed(2)} €</strong>
+        </div>
+    
         {spese.map((s) => (
           <div key={s.id} className="spesa-row" style={styles.row}>
             <textarea
@@ -225,6 +241,7 @@ const styles: Record<string, React.CSSProperties> = {
     padding: 32,
     maxWidth: 900,
     margin: "0 auto",
+    position: "relative",
   },
   title: {
     fontSize: 34,
@@ -279,6 +296,28 @@ const styles: Record<string, React.CSSProperties> = {
     fontWeight: 700,
     cursor: "pointer",
   },
+  totale: {
+    marginTop: 8,
+    marginBottom: 16,
+    fontSize: 18,
+    fontWeight: 600,
+    textAlign: "right",
+  },
+  dashboardButton: {
+    position: "absolute",
+    top: 24,
+    right: 24,
+    backgroundColor: "#111827",
+    color: "#fff",
+    border: "none",
+    borderRadius: 8,
+    padding: "10px 16px",
+    fontSize: 14,
+    fontWeight: 600,
+    cursor: "pointer",
+  },
+
+
   deleteButton: {
     width: 48,
     height: 48,
